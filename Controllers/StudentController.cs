@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using SchoolAPI.Models;
+using SchoolAPI.Models.Entites;
 using SchoolAPI.Services;
 
 namespace SchoolAPI.Controllers

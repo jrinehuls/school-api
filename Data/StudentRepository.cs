@@ -1,4 +1,4 @@
-﻿using SchoolAPI.Models;
+﻿using SchoolAPI.Models.Entites;
 
 namespace SchoolAPI.Data
 {

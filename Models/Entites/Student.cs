@@ -1,4 +1,4 @@
-﻿namespace SchoolAPI.Models
+﻿namespace SchoolAPI.Models.Entites
 {
     public class Student
     {

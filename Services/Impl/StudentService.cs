@@ -1,5 +1,5 @@
 ﻿using SchoolAPI.Data;
-using SchoolAPI.Models;
+using SchoolAPI.Models.Entites;
 
 namespace SchoolAPI.Services.Impl
 {
