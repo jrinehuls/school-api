@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using SchoolAPI.Data;
 using SchoolAPI.Models;
 using SchoolAPI.Services;
 
@@ -21,6 +20,17 @@ namespace SchoolAPI.Controllers
         [HttpGet("All")]
         public ActionResult<IEnumerable<Student>> GetStudents()
         {
+            return Ok(_studentService.GetStudents());
+        }
+
+        [HttpGet("{id:long}")]
+        public ActionResult<Student> GetStudent([FromRoute] long id)
+        {
+            Student? student = _studentService.GetStudentById(id);
+            if (student == null)
+            {
+                return NotFound($"{{\n  \"message\": \"Student with id {id} not found\"\n}}");
+            }
             return Ok(_studentService.GetStudents());
         }
 

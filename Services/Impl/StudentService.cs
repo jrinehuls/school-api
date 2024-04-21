@@ -7,7 +7,13 @@ namespace SchoolAPI.Services.Impl
     {
         public Student GetStudentById(long id)
         {
-            throw new NotImplementedException();
+            try {
+                Student student = StudentRepository.Students.FirstOrDefault(s => s.Id == id);
+                return student;
+            } catch (ArgumentNullException e)
+            {
+                return null;
+            }
         }
 
         public List<Student> GetStudents()
