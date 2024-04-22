@@ -31,17 +31,20 @@ namespace SchoolAPI.Controllers
         [HttpGet("{id:long:min(0)}")]
         [ProducesResponseType<Student>(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType<string>(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [Produces(MediaTypeNames.Application.Json)]
         public ActionResult<Student> GetStudent([FromRoute] long id)
         {
-            Student? student = _studentService.GetStudentById(id);
-            if (student == null)
+            try
             {
-                return NotFound($"{{\n  \"message\": \"Student with id {id} not found\"\n}}");
+                return Ok(_studentService.GetStudentById(id));
             }
-            return Ok(_studentService.GetStudents());
+            catch (StudentNotFoundException e)
+            {
+                return NotFound($"{{\n  \"message\": \"{e.Message}\"\n}}");
+            }
+
         }
 
         [HttpPost]
@@ -71,7 +74,7 @@ namespace SchoolAPI.Controllers
             }
             catch (StudentNotFoundException e)
             {
-                return NotFound($"{{\n\t\"message\": \"{e.Message}\"\n}}");
+                return NotFound($"{{\n  \"message\": \"{e.Message}\"\n}}");
             }
         }
 
@@ -90,7 +93,7 @@ namespace SchoolAPI.Controllers
             }
             catch (StudentNotFoundException e)
             {
-                return NotFound($"{{\n\t\"message\": \"{e.Message}\"\n}}");
+                return NotFound($"{{\n  \"message\": \"{e.Message}\"\n}}");
             }
         }
     }

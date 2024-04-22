@@ -12,16 +12,14 @@ namespace SchoolAPI.Services.Impl
             return StudentRepository.Students;
         }
 
-
         public Student GetStudentById(long id)
         {
-            try {
-                Student student = StudentRepository.Students.FirstOrDefault(s => s.Id == id);
-                return student;
-            } catch (ArgumentNullException e)
+            Student? student = StudentRepository.Students.FirstOrDefault(s => s.Id == id);
+            if (student == null)
             {
-                return null;
+                throw new StudentNotFoundException(id);
             }
+            return student;
         }
 
         public Student SaveStudent(Student student)
