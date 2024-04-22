@@ -13,4 +13,6 @@ ASP.NET Web API for Students, Courses, and Grades
 	<li>Add EntityFramework and configure connection string</li>
 	<li>Add ActionFilterAttribute and [ValidateModel] for DTOs to send data for bad requests</li>
 	<li>Add OpenAPI docs for all possible response codes</li>
+	<li>If exists, implement global exception handler to send responses if service throws exception</li>
+	<li>Add custom exceptions for not found, conflicts, etc. for entities</li>
 </ul>
