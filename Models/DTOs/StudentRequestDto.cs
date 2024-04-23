@@ -17,9 +17,6 @@ namespace SchoolAPI.Models.DTOs
         [EmailAddress]
         public string? Email { get; set; }
 
-        [Required(AllowEmptyStrings = false)]
-        public string? Address { get; set; }
-
         [Past]
         public DateTime? BirthDate { get; set; } 
     }
