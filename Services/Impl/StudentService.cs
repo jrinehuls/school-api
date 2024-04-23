@@ -41,7 +41,12 @@ namespace SchoolAPI.Services.Impl
 
         public StudentResponseDto SaveStudent(StudentRequestDto requestDto)
         {
-            long newId = StudentRepository.Students.Max(s => s.Id) + 1;
+            long newId = 0;
+            if (StudentRepository.Students.Count > 0)
+            {
+                newId = StudentRepository.Students.Max(s => s.Id) + 1;
+            }
+
             Student student = new ()
             {
                 Id = newId,

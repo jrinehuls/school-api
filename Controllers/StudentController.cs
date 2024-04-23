@@ -33,7 +33,7 @@ namespace SchoolAPI.Controllers
         [HttpGet("{id:long:min(0)}", Name = getStudentById)]
         [ProducesResponseType<StudentResponseDto>(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType<string>(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [Produces(MediaTypeNames.Application.Json)]
         public ActionResult<StudentResponseDto> GetStudentById([FromRoute] long id)
@@ -64,7 +64,7 @@ namespace SchoolAPI.Controllers
         [HttpPut("{id:long:min(0)}")]
         [ProducesResponseType(typeof(StudentResponseDto), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType<string>(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [Consumes(MediaTypeNames.Application.Json)]
         [Produces(MediaTypeNames.Application.Json)]
@@ -83,7 +83,7 @@ namespace SchoolAPI.Controllers
         [HttpDelete("{id:long:min(0)}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType<string>(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [Produces(MediaTypeNames.Application.Json)]
         public ActionResult DeleteStudent([FromRoute] long id)
