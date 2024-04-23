@@ -76,21 +76,19 @@ namespace SchoolAPI.Services.Impl
             {
                 throw new StudentNotFoundException(id);
             }
-            int index = StudentRepository.Students.IndexOf(student);
+
             student.FirstName = requestDto.FirstName;
             student.LastName = requestDto.LastName;
             student.Email = requestDto.Email;
             student.BirthDate = requestDto.BirthDate;
-            StudentRepository.Students[index] = student;
 
-            Student updatedStudent = StudentRepository.Students[index];
             StudentResponseDto responseDto = new()
             {
-                Id = updatedStudent.Id,
-                FirstName = updatedStudent.FirstName,
-                LastName = updatedStudent.LastName,
-                Email = updatedStudent.Email,
-                BirthDate = updatedStudent.BirthDate
+                Id = student.Id,
+                FirstName = student.FirstName,
+                LastName = student.LastName,
+                Email = student.Email,
+                BirthDate = student.BirthDate
             };
 
             return responseDto;

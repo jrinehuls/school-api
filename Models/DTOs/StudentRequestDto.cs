@@ -15,6 +15,7 @@ namespace SchoolAPI.Models.DTOs
         public string? LastName { get; set; }
 
         [EmailAddress]
+        [Required]
         public string? Email { get; set; }
 
         [Past]

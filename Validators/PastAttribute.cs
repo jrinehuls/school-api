@@ -4,6 +4,8 @@ namespace SchoolAPI.Validators
 {
     public class PastAttribute : ValidationAttribute
     {
+        private string DefaulErrorMessage { get; set; } = "Date should be in the past.";
+        
         public PastAttribute() {
         }
         
@@ -15,7 +17,7 @@ namespace SchoolAPI.Validators
                 DateTime date = (DateTime)value;
                 if (date >= DateTime.Today)
                 {
-                    return new ValidationResult("Date should be in the past.");
+                    return new ValidationResult(ErrorMessage ?? DefaulErrorMessage);
                 }
                 return ValidationResult.Success;
             }

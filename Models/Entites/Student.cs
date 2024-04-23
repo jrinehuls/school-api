@@ -22,6 +22,7 @@ namespace SchoolAPI.Models.Entites
         // Want this to be unique later
         public string? Email { get; set; }
 
+        [Column(TypeName = "Date")]
         public DateTime? BirthDate { get; set; }
     }
 }
