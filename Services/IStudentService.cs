@@ -1,13 +1,14 @@
-﻿using SchoolAPI.Models.Entites;
+﻿using SchoolAPI.Models.DTOs;
+using SchoolAPI.Models.Entites;
 
 namespace SchoolAPI.Services
 {
     public interface IStudentService
     {
-        public List<Student> GetStudents();
-        public Student GetStudentById(long id);
-        public Student SaveStudent(Student student);
-        public Student UpdateStudent(long id, Student student);
+        public List<StudentResponseDto> GetStudents();
+        public StudentResponseDto GetStudentById(long id);
+        public StudentResponseDto SaveStudent(StudentRequestDto student);
+        public StudentResponseDto UpdateStudent(long id, StudentRequestDto student);
         public void DeleteStudent(long id);
     }
 }
