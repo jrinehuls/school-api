@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using SchoolAPI.Validators;
+using System.ComponentModel.DataAnnotations;
 
 namespace SchoolAPI.Models.DTOs
 {
@@ -6,7 +7,7 @@ namespace SchoolAPI.Models.DTOs
     {
         // Allowing null is fine here because validation will
         // pick up on null, but be required, sending meaningful
-        // response on fileds to correct
+        // response on fields to be corrected
         [Required(AllowEmptyStrings = false)]
         public string? FirstName { get; set; }
 
@@ -18,5 +19,8 @@ namespace SchoolAPI.Models.DTOs
 
         [Required(AllowEmptyStrings = false)]
         public string? Address { get; set; }
+
+        [Past]
+        public DateTime? BirthDate { get; set; } 
     }
 }
