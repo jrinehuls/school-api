@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using SchoolAPI.Data;
 using SchoolAPI.Exceptions.NotFound;
 using SchoolAPI.Models.DTOs;
 using SchoolAPI.Models.Entites;
@@ -14,6 +16,7 @@ namespace SchoolAPI.Controllers
     public class StudentController : ControllerBase
     {
         private const string getStudentById = "GetStudentById";
+
         private readonly IStudentService _studentService;
 
         public StudentController(IStudentService studentService)
@@ -30,7 +33,7 @@ namespace SchoolAPI.Controllers
             return Ok(_studentService.GetStudents());
         }
 
-        [HttpGet("{id:long:min(0)}", Name = getStudentById)]
+        [HttpGet("{id:long:min(1)}", Name = getStudentById)]
         [ProducesResponseType<StudentResponseDto>(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -61,7 +64,7 @@ namespace SchoolAPI.Controllers
             return CreatedAtRoute(getStudentById, new { id = responseDto.Id }, responseDto);
         }
 
-        [HttpPut("{id:long:min(0)}")]
+        [HttpPut("{id:long:min(1)}")]
         [ProducesResponseType(typeof(StudentResponseDto), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -80,7 +83,7 @@ namespace SchoolAPI.Controllers
             }
         }
 
-        [HttpDelete("{id:long:min(0)}")]
+        [HttpDelete("{id:long:min(1)}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
