@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SchoolAPI.Models.Entites
@@ -7,20 +6,18 @@ namespace SchoolAPI.Models.Entites
     public class Student
     {
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long Id { get; set; }
 
-        [Required]
         [StringLength(255)]
-        public string? FirstName { get; set; }
+        public string FirstName { get; set; }
 
-        [Required]
         [StringLength(255)]
-        public string? LastName { get; set; }
+        public string LastName { get; set; }
 
-        [Required]
         [StringLength(255)]
         // Want this to be unique later
-        public string? Email { get; set; }
+        public string Email { get; set; }
 
         [Column(TypeName = "Date")]
         public DateTime? BirthDate { get; set; }
