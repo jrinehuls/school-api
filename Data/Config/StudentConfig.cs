@@ -9,8 +9,8 @@ namespace SchoolAPI.Data.Config
     {
         public void Configure(EntityTypeBuilder<Student> builder)
         {
-            builder.HasData(new Student() { FirstName = "Patty", LastName = "Patty",
-            Email = "patty@patty.com", BirthDate = new DateTime(20, 11, 10)});
+            builder.HasData(new Student() { Id = 1, FirstName = "Patty", LastName = "Patty",
+            Email = "patty@patty.com", BirthDate = new DateTime(2020, 11, 10)});
         }
     }
 }
