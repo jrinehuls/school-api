@@ -35,7 +35,7 @@ namespace SchoolAPI.Services.Impl
             Student? student = await _context.Students.FirstOrDefaultAsync(s => s.Id == id);
             if (student is null)
             {
-                throw new StudentNotFoundException(id);
+                throw new NotFoundException(nameof(student.Id), $"{id}");
             }
             StudentResponseDto studentDto = new ()
             {
@@ -78,11 +78,16 @@ namespace SchoolAPI.Services.Impl
 
         public async Task<StudentResponseDto> UpdateStudent(long id, StudentRequestDto requestDto)
         {
-            // TODO: Throw conflict if student tries updating email that's in use
             Student? student = await _context.Students.FirstOrDefaultAsync(s => s.Id == id);
             if (student == null)
             {
-                throw new StudentNotFoundException(id);
+                throw new NotFoundException(nameof(student.Id), $"{id}");
+            }
+
+            // If email exists and does not belong to same studnet, throw conflict
+            Student? studentWithSameEmail = await GetStudentByEmail(requestDto.Email);
+            if (studentWithSameEmail is not null && studentWithSameEmail.Id != student.Id) {
+                throw new ConflictException(nameof(requestDto.Email), requestDto.Email);
             }
 
             student.FirstName = requestDto.FirstName;
@@ -109,7 +114,7 @@ namespace SchoolAPI.Services.Impl
             Student? student = await _context.Students.FirstOrDefaultAsync(s => s.Id == id);
             if (student == null)
             {
-                throw new StudentNotFoundException(id);
+                throw new NotFoundException(nameof(student.Id), $"{id}");
             }
             _context.Students.Remove(student);
             await _context.SaveChangesAsync();
