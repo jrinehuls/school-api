@@ -10,14 +10,14 @@ namespace SchoolAPI.Models.Entites
         public long Id { get; set; }
 
         [StringLength(255)]
-        public string FirstName { get; set; }
+        public string FirstName { get; set; } = null!;
 
         [StringLength(255)]
-        public string LastName { get; set; }
+        public string LastName { get; set; } = null!;
 
         [StringLength(255)]
         // Want this to be unique later
-        public string Email { get; set; }
+        public string Email { get; set; } = null!;
 
         [Column(TypeName = "Date")]
         public DateTime? BirthDate { get; set; }

@@ -7,6 +7,7 @@ using SchoolAPI.Models.DTOs;
 using SchoolAPI.Models.Entites;
 using SchoolAPI.Services;
 using System.Net.Mime;
+using System.Runtime.CompilerServices;
 
 namespace SchoolAPI.Controllers
 {
@@ -28,9 +29,9 @@ namespace SchoolAPI.Controllers
         [ProducesResponseType<List<StudentResponseDto>>(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [Produces(MediaTypeNames.Application.Json)]
-        public ActionResult<List<StudentResponseDto>> GetAllStudents()
+        public async Task<ActionResult<List<StudentResponseDto>>> GetAllStudents()
         {
-            return Ok(_studentService.GetStudents());
+            return Ok(await _studentService.GetStudents());
         }
 
         [HttpGet("{id:long:min(1)}", Name = getStudentById)]
@@ -39,11 +40,11 @@ namespace SchoolAPI.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [Produces(MediaTypeNames.Application.Json)]
-        public ActionResult<StudentResponseDto> GetStudentById([FromRoute] long id)
+        public async Task<ActionResult<StudentResponseDto>> GetStudentById([FromRoute] long id)
         {
             try
             {
-                return Ok(_studentService.GetStudentById(id));
+                return Ok(await _studentService.GetStudentById(id));
             }
             catch (StudentNotFoundException e)
             {
@@ -58,9 +59,9 @@ namespace SchoolAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [Produces(MediaTypeNames.Application.Json)]
         [Consumes(MediaTypeNames.Application.Json)]
-        public ActionResult<StudentResponseDto> PostStudent([FromBody] StudentRequestDto studentDto)
+        public async Task<ActionResult<StudentResponseDto>> PostStudent([FromBody] StudentRequestDto studentDto)
         {
-            StudentResponseDto responseDto = _studentService.SaveStudent(studentDto);
+            StudentResponseDto responseDto = await _studentService.SaveStudent(studentDto);
             return CreatedAtRoute(getStudentById, new { id = responseDto.Id }, responseDto);
         }
 
@@ -71,11 +72,11 @@ namespace SchoolAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [Consumes(MediaTypeNames.Application.Json)]
         [Produces(MediaTypeNames.Application.Json)]
-        public ActionResult<StudentResponseDto> UpdateStudent([FromRoute] long id, [FromBody] StudentRequestDto studentDto)
+        public async Task<ActionResult<StudentResponseDto>> UpdateStudent([FromRoute] long id, [FromBody] StudentRequestDto studentDto)
         {
             try
             {
-                return Ok(_studentService.UpdateStudent(id, studentDto));
+                return Ok(await _studentService.UpdateStudent(id, studentDto));
             }
             catch (StudentNotFoundException e)
             {
@@ -89,11 +90,11 @@ namespace SchoolAPI.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [Produces(MediaTypeNames.Application.Json)]
-        public ActionResult DeleteStudent([FromRoute] long id)
+        public async Task<ActionResult> DeleteStudent([FromRoute] long id)
         {
             try
             {
-                _studentService.DeleteStudent(id);
+                await _studentService.DeleteStudent(id);
                 return NoContent();
             }
             catch (StudentNotFoundException e)

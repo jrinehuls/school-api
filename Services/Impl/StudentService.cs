@@ -1,29 +1,38 @@
-﻿using SchoolAPI.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using SchoolAPI.Data;
 using SchoolAPI.Exceptions.NotFound;
 using SchoolAPI.Models.DTOs;
 using SchoolAPI.Models.Entites;
+using System.Runtime.CompilerServices;
 
 namespace SchoolAPI.Services.Impl
 {
     public class StudentService : IStudentService
     {
 
-        public List<StudentResponseDto> GetStudents()
+        private readonly DataContext _context;
+
+        public StudentService(DataContext context)
         {
-            IEnumerable<StudentResponseDto> dtos = StudentRepository.Students.Select(s => new StudentResponseDto()
+            _context = context;
+        }
+
+        public async Task<List<StudentResponseDto>> GetStudents()
+        {
+            List<StudentResponseDto> dtos = await _context.Students.Select(s => new StudentResponseDto()
             {
                 Id = s.Id,
                 FirstName = s.FirstName,
                 LastName = s.LastName,
                 Email = s.Email,
                 BirthDate = s.BirthDate
-            });
-            return dtos.ToList();
+            }).ToListAsync();
+            return dtos;
         }
 
-        public StudentResponseDto GetStudentById(long id)
+        public async Task<StudentResponseDto> GetStudentById(long id)
         {
-            Student? student = StudentRepository.Students.FirstOrDefault(s => s.Id == id);
+            Student? student = await _context.Students.FirstOrDefaultAsync(s => s.Id == id);
             if (student is null)
             {
                 throw new StudentNotFoundException(id);
@@ -39,25 +48,20 @@ namespace SchoolAPI.Services.Impl
             return studentDto;
         }
 
-        public StudentResponseDto SaveStudent(StudentRequestDto requestDto)
+        public async Task<StudentResponseDto> SaveStudent(StudentRequestDto requestDto)
         {
-            long newId = 1;
-            if (StudentRepository.Students.Count > 0)
-            {
-                newId = StudentRepository.Students.Max(s => s.Id) + 1;
-            }
 
             Student student = new ()
             {
-                Id = newId,
                 FirstName = requestDto.FirstName,
                 LastName = requestDto.LastName,
                 Email = requestDto.Email,
                 BirthDate = requestDto.BirthDate
             };
-            StudentRepository.Students.Add(student);
+            _context.Students.Add(student);
+            await _context.SaveChangesAsync();
 
-            Student createdStudent = StudentRepository.Students.FirstOrDefault(s => s.Id == student.Id)!;
+            Student createdStudent = await _context.Students.FirstAsync(s => s.Id == student.Id);
             StudentResponseDto studentDto = new ()
             {
                 Id = createdStudent.Id,
@@ -69,9 +73,9 @@ namespace SchoolAPI.Services.Impl
             return studentDto;
         }
 
-        public StudentResponseDto UpdateStudent(long id, StudentRequestDto requestDto)
+        public async Task<StudentResponseDto> UpdateStudent(long id, StudentRequestDto requestDto)
         {
-            Student? student = StudentRepository.Students.FirstOrDefault(s => s.Id == id);
+            Student? student = await _context.Students.FirstOrDefaultAsync(s => s.Id == id);
             if (student == null)
             {
                 throw new StudentNotFoundException(id);
@@ -81,6 +85,8 @@ namespace SchoolAPI.Services.Impl
             student.LastName = requestDto.LastName;
             student.Email = requestDto.Email;
             student.BirthDate = requestDto.BirthDate;
+
+            await _context.SaveChangesAsync();
 
             StudentResponseDto responseDto = new()
             {
@@ -94,14 +100,15 @@ namespace SchoolAPI.Services.Impl
             return responseDto;
         }
 
-        public void DeleteStudent(long id)
+        public async Task DeleteStudent(long id)
         {
-            Student? student = StudentRepository.Students.FirstOrDefault(s => s.Id == id);
+            Student? student = await _context.Students.FirstOrDefaultAsync(s => s.Id == id);
             if (student == null)
             {
                 throw new StudentNotFoundException(id);
             }
-            StudentRepository.Students.Remove(student);
+            _context.Students.Remove(student);
+            await _context.SaveChangesAsync();
         }
     }
 }

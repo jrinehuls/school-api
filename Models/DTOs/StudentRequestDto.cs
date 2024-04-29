@@ -9,14 +9,14 @@ namespace SchoolAPI.Models.DTOs
         // pick up on null, but be required, sending meaningful
         // response on fields to be corrected
         [Required(AllowEmptyStrings = false)]
-        public string? FirstName { get; set; }
+        public string FirstName { get; set; } = null!;
 
         [Required(AllowEmptyStrings = false)]
-        public string? LastName { get; set; }
+        public string LastName { get; set; } = null!;
 
         [EmailAddress]
         [Required]
-        public string? Email { get; set; }
+        public string Email { get; set; } = null!;
 
         [Past]
         public DateTime? BirthDate { get; set; } 
