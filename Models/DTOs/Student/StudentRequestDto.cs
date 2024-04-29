@@ -1,7 +1,7 @@
 ﻿using SchoolAPI.Validators;
 using System.ComponentModel.DataAnnotations;
 
-namespace SchoolAPI.Models.DTOs
+namespace SchoolAPI.Models.DTOs.Student
 {
     public class StudentRequestDto
     {
@@ -19,6 +19,6 @@ namespace SchoolAPI.Models.DTOs
         public string Email { get; set; } = null!;
 
         [Past]
-        public DateTime? BirthDate { get; set; } 
+        public DateTime? BirthDate { get; set; }
     }
 }

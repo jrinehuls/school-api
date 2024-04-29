@@ -1,4 +1,4 @@
-﻿using SchoolAPI.Models.DTOs;
+﻿using SchoolAPI.Models.DTOs.Student;
 using SchoolAPI.Models.Entites;
 
 namespace SchoolAPI.Services

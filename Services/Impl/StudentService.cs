@@ -1,11 +1,9 @@
-﻿using Microsoft.Data.SqlClient;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using SchoolAPI.Data;
 using SchoolAPI.Exceptions.Conflict;
 using SchoolAPI.Exceptions.NotFound;
-using SchoolAPI.Models.DTOs;
+using SchoolAPI.Models.DTOs.Student;
 using SchoolAPI.Models.Entites;
-using System.Runtime.CompilerServices;
 
 namespace SchoolAPI.Services.Impl
 {

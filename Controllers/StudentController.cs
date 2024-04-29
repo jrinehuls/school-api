@@ -1,22 +1,15 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.JsonPatch;
-using Microsoft.AspNetCore.Mvc;
-using SchoolAPI.Data;
-using SchoolAPI.Exceptions.Conflict;
-using SchoolAPI.Exceptions.NotFound;
+﻿using Microsoft.AspNetCore.Mvc;
 using SchoolAPI.Filters;
-using SchoolAPI.Models.DTOs;
-using SchoolAPI.Models.Entites;
+using SchoolAPI.Models.DTOs.Student;
 using SchoolAPI.Services;
 using System.Net.Mime;
-using System.Runtime.CompilerServices;
 
 namespace SchoolAPI.Controllers
 {
 
     [ApiController]
-    [Route("api/[controller]")]
     [StudentFilter]
+    [Route("api/[controller]")]
     public class StudentController : ControllerBase
     {
         private const string getStudentById = "GetStudentById";
