@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using SchoolAPI.Data;
 using SchoolAPI.Exceptions.Conflict;
 using SchoolAPI.Exceptions.NotFound;
+using SchoolAPI.Filters;
 using SchoolAPI.Models.DTOs;
 using SchoolAPI.Models.Entites;
 using SchoolAPI.Services;
@@ -15,6 +16,7 @@ namespace SchoolAPI.Controllers
 
     [ApiController]
     [Route("api/[controller]")]
+    [StudentNotFoundFilter]
     public class StudentController : ControllerBase
     {
         private const string getStudentById = "GetStudentById";
@@ -43,6 +45,8 @@ namespace SchoolAPI.Controllers
         [Produces(MediaTypeNames.Application.Json)]
         public async Task<ActionResult<StudentResponseDto>> GetStudentById([FromRoute] long id)
         {
+            return Ok(await _studentService.GetStudentById(id));
+            /*
             try
             {
                 return Ok(await _studentService.GetStudentById(id));
@@ -50,7 +54,7 @@ namespace SchoolAPI.Controllers
             catch (StudentNotFoundException e)
             {
                 return NotFound($"{{\n  \"message\": \"{e.Message}\"\n}}");
-            }
+            }*/
 
         }
 
