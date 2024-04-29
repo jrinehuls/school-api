@@ -16,7 +16,7 @@ namespace SchoolAPI.Controllers
 
     [ApiController]
     [Route("api/[controller]")]
-    [StudentNotFoundFilter]
+    [StudentFilter]
     public class StudentController : ControllerBase
     {
         private const string getStudentById = "GetStudentById";
@@ -46,55 +46,32 @@ namespace SchoolAPI.Controllers
         public async Task<ActionResult<StudentResponseDto>> GetStudentById([FromRoute] long id)
         {
             return Ok(await _studentService.GetStudentById(id));
-            /*
-            try
-            {
-                return Ok(await _studentService.GetStudentById(id));
-            }
-            catch (StudentNotFoundException e)
-            {
-                return NotFound($"{{\n  \"message\": \"{e.Message}\"\n}}");
-            }*/
-
         }
 
         [HttpPost(Name = "CreateStudent")]
         [ProducesResponseType<StudentResponseDto>(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [Produces(MediaTypeNames.Application.Json)]
         [Consumes(MediaTypeNames.Application.Json)]
         public async Task<ActionResult<StudentResponseDto>> PostStudent([FromBody] StudentRequestDto studentDto)
         {
-            try
-            {
-                StudentResponseDto responseDto = await _studentService.SaveStudent(studentDto);
-                return CreatedAtRoute(getStudentById, new { id = responseDto.Id }, responseDto);
-            }
-            catch (ConflictException e)
-            {
-                return Conflict(e.Message);
-            }
-
+            StudentResponseDto responseDto = await _studentService.SaveStudent(studentDto);
+            return CreatedAtRoute(getStudentById, new { id = responseDto.Id }, responseDto);
         }
 
         [HttpPut("{id:long:min(1)}")]
         [ProducesResponseType(typeof(StudentResponseDto), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [Consumes(MediaTypeNames.Application.Json)]
         [Produces(MediaTypeNames.Application.Json)]
         public async Task<ActionResult<StudentResponseDto>> UpdateStudent([FromRoute] long id, [FromBody] StudentRequestDto studentDto)
         {
-            try
-            {
-                return Ok(await _studentService.UpdateStudent(id, studentDto));
-            }
-            catch (StudentNotFoundException e)
-            {
-                return NotFound($"{{\n  \"message\": \"{e.Message}\"\n}}");
-            }
+            return Ok(await _studentService.UpdateStudent(id, studentDto));
         }
 
         [HttpDelete("{id:long:min(1)}")]
@@ -105,15 +82,8 @@ namespace SchoolAPI.Controllers
         [Produces(MediaTypeNames.Application.Json)]
         public async Task<ActionResult> DeleteStudent([FromRoute] long id)
         {
-            try
-            {
-                await _studentService.DeleteStudent(id);
-                return NoContent();
-            }
-            catch (StudentNotFoundException e)
-            {
-                return NotFound($"{{\n  \"message\": \"{e.Message}\"\n}}");
-            }
+            await _studentService.DeleteStudent(id);
+            return NoContent();
         }
     }
 }

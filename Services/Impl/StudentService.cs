@@ -66,20 +66,21 @@ namespace SchoolAPI.Services.Impl
             _context.Students.Add(student);
             await _context.SaveChangesAsync();
 
-            Student createdStudent = await _context.Students.FirstAsync(s => s.Id == student.Id);
+            // Student createdStudent = await _context.Students.FirstAsync(s => s.Id == student.Id);
             StudentResponseDto studentDto = new ()
             {
-                Id = createdStudent.Id,
-                FirstName = createdStudent.FirstName,
-                LastName = createdStudent.LastName,
-                Email = createdStudent.Email,
-                BirthDate = createdStudent.BirthDate
+                Id = student.Id,
+                FirstName = student.FirstName,
+                LastName = student.LastName,
+                Email = student.Email,
+                BirthDate = student.BirthDate
             };
             return studentDto;
         }
 
         public async Task<StudentResponseDto> UpdateStudent(long id, StudentRequestDto requestDto)
         {
+            // TODO: Throw conflict if student tries updating email that's in use
             Student? student = await _context.Students.FirstOrDefaultAsync(s => s.Id == id);
             if (student == null)
             {
