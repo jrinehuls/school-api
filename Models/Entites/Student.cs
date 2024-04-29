@@ -1,8 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Net.Mail;
 
 namespace SchoolAPI.Models.Entites
 {
+    [Index(nameof(Email), IsUnique = true)]
     public class Student
     {
         [Key]

@@ -1,5 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using SchoolAPI.Data;
+using SchoolAPI.Exceptions.Conflict;
 using SchoolAPI.Exceptions.NotFound;
 using SchoolAPI.Models.DTOs;
 using SchoolAPI.Models.Entites;
@@ -50,7 +52,10 @@ namespace SchoolAPI.Services.Impl
 
         public async Task<StudentResponseDto> SaveStudent(StudentRequestDto requestDto)
         {
-
+            if (await GetStudentByEmail(requestDto.Email) is not null)
+            {
+                throw new ConflictException(nameof(requestDto.Email), requestDto.Email);
+            }
             Student student = new ()
             {
                 FirstName = requestDto.FirstName,
@@ -109,6 +114,12 @@ namespace SchoolAPI.Services.Impl
             }
             _context.Students.Remove(student);
             await _context.SaveChangesAsync();
+        }
+
+        private async Task<Student?> GetStudentByEmail(string email)
+        {
+            Student? student = await _context.Students.FirstOrDefaultAsync(student => student.Email == email);
+            return student;
         }
     }
 }

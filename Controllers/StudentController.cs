@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using SchoolAPI.Data;
+using SchoolAPI.Exceptions.Conflict;
 using SchoolAPI.Exceptions.NotFound;
 using SchoolAPI.Models.DTOs;
 using SchoolAPI.Models.Entites;
@@ -61,8 +62,16 @@ namespace SchoolAPI.Controllers
         [Consumes(MediaTypeNames.Application.Json)]
         public async Task<ActionResult<StudentResponseDto>> PostStudent([FromBody] StudentRequestDto studentDto)
         {
-            StudentResponseDto responseDto = await _studentService.SaveStudent(studentDto);
-            return CreatedAtRoute(getStudentById, new { id = responseDto.Id }, responseDto);
+            try
+            {
+                StudentResponseDto responseDto = await _studentService.SaveStudent(studentDto);
+                return CreatedAtRoute(getStudentById, new { id = responseDto.Id }, responseDto);
+            }
+            catch (ConflictException e)
+            {
+                return Conflict(e.Message);
+            }
+
         }
 
         [HttpPut("{id:long:min(1)}")]
