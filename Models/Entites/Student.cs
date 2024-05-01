@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Net.Mail;
 
 namespace SchoolAPI.Models.Entites
 {
@@ -12,6 +11,7 @@ namespace SchoolAPI.Models.Entites
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long Id { get; set; }
 
+        // Could add Required attribute and set prop to nullable and still makes column non-nullable
         [StringLength(255)]
         public string FirstName { get; set; } = null!;
 
@@ -19,7 +19,6 @@ namespace SchoolAPI.Models.Entites
         public string LastName { get; set; } = null!;
 
         [StringLength(255)]
-        // Want this to be unique later
         public string Email { get; set; } = null!;
 
         [Column(TypeName = "Date")]

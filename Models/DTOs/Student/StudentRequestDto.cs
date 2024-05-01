@@ -5,17 +5,17 @@ namespace SchoolAPI.Models.DTOs.Student
 {
     public class StudentRequestDto
     {
-        // Allowing null is fine here because validation will
-        // pick up on null, but be required, sending meaningful
-        // response on fields to be corrected
         [Required(AllowEmptyStrings = false)]
+        [StringLength(255)]
         public string FirstName { get; set; } = null!;
 
         [Required(AllowEmptyStrings = false)]
+        [StringLength(255)]
         public string LastName { get; set; } = null!;
 
-        [EmailAddress]
         [Required]
+        [EmailAddress]
+        [StringLength(255)]
         public string Email { get; set; } = null!;
 
         [Past]

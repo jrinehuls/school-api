@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
+﻿
 namespace SchoolAPI.Models.DTOs.Student
 {
     public class StudentResponseDto

@@ -7,6 +7,7 @@ namespace SchoolAPI.Data
     public class DataContext : DbContext
     {
         public DbSet<Student> Students { get; set; }
+        public DbSet<Course> Courses { get; set; }
         
         public DataContext(DbContextOptions<DataContext> options) : base(options)
         {
@@ -15,6 +16,7 @@ namespace SchoolAPI.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfiguration(new StudentConfig());
+            modelBuilder.ApplyConfiguration(new CourseConfig());
         }
 
     }
