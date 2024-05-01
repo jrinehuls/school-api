@@ -64,7 +64,6 @@ namespace SchoolAPI.Services.Impl
             _context.Students.Add(student);
             await _context.SaveChangesAsync();
 
-            // Student createdStudent = await _context.Students.FirstAsync(s => s.Id == student.Id);
             StudentResponseDto studentDto = new ()
             {
                 Id = student.Id,
