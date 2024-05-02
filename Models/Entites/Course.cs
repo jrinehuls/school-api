@@ -23,5 +23,7 @@ namespace SchoolAPI.Models.Entites
         [Required]
         [StringLength(500)]
         public string? Description { get; set; }
+
+        public HashSet<Student> Students { get; set; } = [];
     }
 }

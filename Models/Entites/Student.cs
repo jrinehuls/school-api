@@ -23,5 +23,7 @@ namespace SchoolAPI.Models.Entites
 
         [Column(TypeName = "Date")]
         public DateTime? BirthDate { get; set; }
+
+        public HashSet<Course> Courses { get; set; } = [];
     }
 }

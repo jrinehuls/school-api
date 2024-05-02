@@ -31,7 +31,7 @@ namespace SchoolAPI.Controllers
         public async Task<ActionResult<CourseResponseDto>> CreateCourse([FromBody] CourseRequestDto requestDto)
         {
             CourseResponseDto responseDto = await _courseService.CreateCourse(requestDto);
-            return CreatedAtRoute(getCourseById, new {id = responseDto.Id}, responseDto);
+            return CreatedAtRoute(getCourseById, new { id = responseDto.Id }, responseDto);
         }
 
         [HttpGet("All", Name = "GetAllCourses")]
@@ -77,6 +77,17 @@ namespace SchoolAPI.Controllers
         {
             await _courseService.DeleteCourse(id);
             return NoContent();
+        }
+
+        [HttpPatch("{courseId:long:min(1)}/student/{studentId:long:min(1)}")]
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType<CourseStudentsResponseDto>(200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType<ErrorResponse>(404)]
+        [ProducesResponseType(500)]
+        public async Task<ActionResult<CourseStudentsResponseDto>> EnrollStudent([FromRoute] long courseId, [FromRoute] long studentId)
+        {
+            return Ok(await _courseService.EnrollStudent(courseId, studentId));
         }
 
     }

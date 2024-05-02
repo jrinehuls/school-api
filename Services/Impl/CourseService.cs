@@ -3,6 +3,7 @@ using SchoolAPI.Data;
 using SchoolAPI.Exceptions.Conflict;
 using SchoolAPI.Exceptions.NotFound;
 using SchoolAPI.Models.DTOs.Course;
+using SchoolAPI.Models.DTOs.Student;
 using SchoolAPI.Models.Entites;
 
 namespace SchoolAPI.Services.Impl
@@ -121,10 +122,51 @@ namespace SchoolAPI.Services.Impl
             await _dataContext.SaveChangesAsync();
         }
 
+        public async Task<CourseStudentsResponseDto> EnrollStudent(long courseId, long studentId)
+        {
+            Course? course = await _dataContext.Courses
+                .Include(c => c.Students)
+                .FirstOrDefaultAsync(c => c.Id == courseId);
+            if (course is null)
+            {
+                throw new NotFoundException(nameof(Course.Id), courseId.ToString());
+            }
+
+            Student? student = await _dataContext.Students.FirstOrDefaultAsync(s => s.Id == studentId);
+            if (student is null)
+            {
+                throw new NotFoundException(nameof(Student.Id), studentId.ToString());
+            }
+
+            course.Students.Add(student);
+            await _dataContext.SaveChangesAsync();
+
+            HashSet<StudentResponseDto> studentDtos = course.Students.Select(s => new StudentResponseDto
+            {
+                Id = s.Id,
+                FirstName = s.FirstName,
+                LastName = s.LastName,
+                Email = s.Email,
+                BirthDate = s.BirthDate
+            }).ToHashSet();
+
+            CourseStudentsResponseDto responseDto = new()
+            {
+                Id = course.Id,
+                Code = course.Code,
+                Name = course.Name,
+                Description = course.Description,
+                CourseStudents = studentDtos
+            };
+
+            return responseDto;
+        }
+
         private async Task<Course?> getCourseByCode(string code)
         {
             Course? course = await _dataContext.Courses.FirstOrDefaultAsync(c => c.Code == code);
             return course;
         }
+
     }
 }
