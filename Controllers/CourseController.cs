@@ -35,7 +35,7 @@ namespace SchoolAPI.Controllers
             return CreatedAtRoute(getCourseById, new { id = responseDto.Id }, responseDto);
         }
 
-        [HttpGet("All", Name = "GetAllCourses")]
+        [HttpGet("all", Name = "GetAllCourses")]
         [Produces(MediaTypeNames.Application.Json)]
         [ProducesResponseType<List<CourseResponseDto>>(200)]
         [ProducesResponseType(500)]
@@ -80,7 +80,7 @@ namespace SchoolAPI.Controllers
             return NoContent();
         }
 
-        [HttpPatch("{courseId:long:min(1)}/Enroll-Student/{studentId:long:min(1)}", Name = "EnrollStudent")]
+        [HttpPatch("{courseId:long:min(1)}/enroll-student/{studentId:long:min(1)}", Name = "EnrollStudent")]
         [Produces(MediaTypeNames.Application.Json)]
         [ProducesResponseType<CourseStudentsResponseDto>(200)]
         [ProducesResponseType(400)]
@@ -91,7 +91,7 @@ namespace SchoolAPI.Controllers
             return Ok(await _courseService.EnrollStudent(courseId, studentId));
         }
 
-        [HttpPatch("{courseId:long:min(1)}/Unenroll-Student/{studentId:long:min(1)}", Name = "UnenrollStudent")]
+        [HttpPatch("{courseId:long:min(1)}/unenroll-student/{studentId:long:min(1)}", Name = "UnenrollStudent")]
         [Produces(MediaTypeNames.Application.Json)]
         [ProducesResponseType<CourseStudentsResponseDto>(200)]
         [ProducesResponseType(400)]
@@ -102,7 +102,7 @@ namespace SchoolAPI.Controllers
             return Ok(await _courseService.UnenrollStudent(courseId, studentId));
         }
 
-        [HttpGet("{id:long:min(1)}/Students", Name = "GetEnrolledStudents")]
+        [HttpGet("{id:long:min(1)}/students", Name = "GetEnrolledStudents")]
         [Produces(MediaTypeNames.Application.Json)]
         [ProducesResponseType<List<StudentResponseDto>>(200)]
         [ProducesResponseType(400)]

@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using SchoolAPI.Data;
+using SchoolAPI.Models.Entites;
 using SchoolAPI.Services;
 using SchoolAPI.Services.Impl;
 
@@ -10,6 +11,8 @@ builder.Services.AddDbContext<DataContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddScoped<IStudentService, StudentService>();
 builder.Services.AddScoped<ICourseService, CourseService>();
+builder.Services.AddScoped<IEntityFinder<Student, long>, StudentEntityFinder>();
+builder.Services.AddScoped<IEntityFinder<Course, long>, CourseEntityFinder>();
 builder.Services.AddControllers().AddNewtonsoftJson();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
