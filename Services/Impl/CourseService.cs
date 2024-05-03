@@ -177,7 +177,7 @@ namespace SchoolAPI.Services.Impl
                 Code = course.Code,
                 Name = course.Name,
                 Description = course.Description,
-                CourseStudents = studentDtos
+                Students = studentDtos
             };
 
             return responseDto;
@@ -220,7 +220,7 @@ namespace SchoolAPI.Services.Impl
                 Code = course.Code,
                 Name = course.Name,
                 Description = course.Description,
-                CourseStudents = studentDtos
+                Students = studentDtos
             };
 
             return responseDto;

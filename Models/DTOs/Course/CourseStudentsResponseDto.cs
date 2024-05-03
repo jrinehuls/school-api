@@ -4,6 +4,6 @@ namespace SchoolAPI.Models.DTOs.Course
 {
     public class CourseStudentsResponseDto : CourseResponseDto
     {
-        public HashSet<StudentResponseDto> CourseStudents { get; set; } = [];
+        public HashSet<StudentResponseDto> Students { get; set; } = [];
     }
 }

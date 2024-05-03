@@ -138,6 +138,16 @@ namespace SchoolAPI.Services.Impl
             await _context.SaveChangesAsync();
         }
 
+        public Task<StudentCoursesResponseDto> EnrollInCourse(long studentId, long courseId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<StudentCoursesResponseDto> UnenrollInCourse(long studentId, long courseId)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task<List<CourseResponseDto>> GetEnrolledCourses(long id)
         {
             Student? student = await _context.Students

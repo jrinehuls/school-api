@@ -10,6 +10,8 @@ namespace SchoolAPI.Services
         public Task<StudentResponseDto> SaveStudent(StudentRequestDto student);
         public Task<StudentResponseDto> UpdateStudent(long id, StudentRequestDto student);
         public Task DeleteStudent(long id);
+        public Task<StudentCoursesResponseDto> EnrollInCourse(long studentId, long courseId);
+        public Task<StudentCoursesResponseDto> UnenrollInCourse(long studentId, long courseId);
         public Task<List<CourseResponseDto>> GetEnrolledCourses(long id);
     }
 }
