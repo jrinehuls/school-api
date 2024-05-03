@@ -1,4 +1,5 @@
-﻿using SchoolAPI.Models.DTOs.Student;
+﻿using SchoolAPI.Models.DTOs.Course;
+using SchoolAPI.Models.DTOs.Student;
 
 namespace SchoolAPI.Services
 {
@@ -9,5 +10,6 @@ namespace SchoolAPI.Services
         public Task<StudentResponseDto> SaveStudent(StudentRequestDto student);
         public Task<StudentResponseDto> UpdateStudent(long id, StudentRequestDto student);
         public Task DeleteStudent(long id);
+        public Task<List<CourseResponseDto>> GetEnrolledCourses(long id);
     }
 }

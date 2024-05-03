@@ -2,6 +2,7 @@
 using SchoolAPI.Data;
 using SchoolAPI.Exceptions.Conflict;
 using SchoolAPI.Exceptions.NotFound;
+using SchoolAPI.Models.DTOs.Course;
 using SchoolAPI.Models.DTOs.Student;
 using SchoolAPI.Models.Entites;
 
@@ -137,10 +138,36 @@ namespace SchoolAPI.Services.Impl
             await _context.SaveChangesAsync();
         }
 
+        public async Task<List<CourseResponseDto>> GetEnrolledCourses(long id)
+        {
+            Student? student = await _context.Students
+                .Include(s => s.Courses)
+                .FirstOrDefaultAsync(s => s.Id == id);
+            if (student is null)
+            {
+                Dictionary<string, List<String>> errors = new()
+                {
+                    { "id", [$"{id}"] }
+                };
+                throw new NotFoundException(errors, $"Student with id {id} not found");
+            }
+            List<CourseResponseDto> courseDtos = student.Courses
+                .Select(c => new CourseResponseDto
+                {
+                    Id = c.Id,
+                    Code = c.Code,
+                    Name = c.Name,
+                    Description = c.Description
+                })
+                .ToList();
+            return courseDtos;
+        }
+
         private async Task<Student?> GetStudentByEmail(string email)
         {
             Student? student = await _context.Students.FirstOrDefaultAsync(student => student.Email == email);
             return student;
         }
+
     }
 }

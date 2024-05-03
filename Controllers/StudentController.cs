@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SchoolAPI.Filters;
 using SchoolAPI.Models.DTOs;
+using SchoolAPI.Models.DTOs.Course;
 using SchoolAPI.Models.DTOs.Student;
 using SchoolAPI.Services;
 using System.Net.Mime;
@@ -68,7 +69,7 @@ namespace SchoolAPI.Controllers
             return Ok(await _studentService.UpdateStudent(id, studentDto));
         }
 
-        [HttpDelete("{id:long:min(1)}")]
+        [HttpDelete("{id:long:min(1)}", Name = "DeleteStudent")]
         [Produces(MediaTypeNames.Application.Json)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -78,6 +79,17 @@ namespace SchoolAPI.Controllers
         {
             await _studentService.DeleteStudent(id);
             return NoContent();
+        }
+
+        [HttpGet("{id:long:min(1)}/Courses", Name = "GetEnrolledCourses")]
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType<List<CourseResponseDto>>(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType<ErrorResponse>(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<List<CourseResponseDto>>> GetEnrolledCourses([FromRoute] long id)
+        {
+            return Ok(await _studentService.GetEnrolledCourses(id));
         }
 
     }

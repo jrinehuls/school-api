@@ -24,7 +24,11 @@ namespace SchoolAPI.Filters
             else if (context.Exception is ConflictException conflict)
             {
                 ErrorResponse errorResponse = HandleApiException(conflict);
-                context.Result = new ConflictObjectResult(errorResponse);
+                ObjectResult result = new(errorResponse)
+                {
+                    StatusCode = conflict.StatusCode
+                };
+                context.Result = result;
             }
         }
 
