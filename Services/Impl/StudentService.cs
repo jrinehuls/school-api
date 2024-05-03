@@ -190,6 +190,12 @@ namespace SchoolAPI.Services.Impl
         }
 
         // -------------------------------- Private Methods --------------------------------
+        private async Task<Student?> GetStudentByEmail(string email)
+        {
+            Student? student = await _context.Students.FirstOrDefaultAsync(student => student.Email == email);
+            return student;
+        }
+
         private async Task<Student> GetStudentByIdWithCoursesOrThrow(long id)
         {
             Student? student = await _context.Students
@@ -219,13 +225,6 @@ namespace SchoolAPI.Services.Impl
                 };
             throw new ConflictException(errors, $"Student with email {email} already exists");
         }
-
-        private async Task<Student?> GetStudentByEmail(string email)
-        {
-            Student? student = await _context.Students.FirstOrDefaultAsync(student => student.Email == email);
-            return student;
-        }
-
 
     }
 }

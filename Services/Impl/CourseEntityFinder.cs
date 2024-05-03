@@ -18,18 +18,13 @@ namespace SchoolAPI.Services.Impl
             Course? course = await _dataContext.Courses.FirstOrDefaultAsync(c => c.Id == id);
             if (course is null)
             {
-                ThrowNotFoundById(id);
-            }
-            return course!;
-        }
-
-        private static void ThrowNotFoundById(long id)
-        {
-            Dictionary<string, List<string>> errors = new()
+                Dictionary<string, List<string>> errors = new()
                 {
                     { "id", [$"{id}"] }
                 };
-            throw new NotFoundException(errors, $"Course with id {id} not found");
+                throw new NotFoundException(errors, $"Course with id {id} not found");
+            }
+            return course!;
         }
 
     }

@@ -188,6 +188,12 @@ namespace SchoolAPI.Services.Impl
         }
 
         // -------------------------------- Private Methods --------------------------------
+        private async Task<Course?> GetCourseByCode(string code)
+        {
+            Course? course = await _dataContext.Courses.FirstOrDefaultAsync(c => c.Code == code);
+            return course;
+        }
+
         private async Task<Course> GetCourseByIdWithStudentsOrThrow(long id)
         {
             Course? course = await _dataContext.Courses
@@ -216,12 +222,6 @@ namespace SchoolAPI.Services.Impl
                     { "code", [code] }
                 };
             throw new ConflictException(errors, $"Course with code {code} already exists");
-        }
-
-        private async Task<Course?> GetCourseByCode(string code)
-        {
-            Course? course = await _dataContext.Courses.FirstOrDefaultAsync(c => c.Code == code);
-            return course;
         }
 
     }

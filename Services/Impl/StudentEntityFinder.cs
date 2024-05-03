@@ -18,18 +18,14 @@ namespace SchoolAPI.Services.Impl
             Student? student = await _dataContext.Students.FirstOrDefaultAsync(s => s.Id == id);
             if (student is null)
             {
-                ThrowNotFoundById(id);
+                Dictionary<string, List<string>> errors = new()
+                {
+                    { "id", [$"{id}"] }
+                };
+                throw new NotFoundException(errors, $"Student with id {id} not found");
             }
             return student!;
         }
 
-        private static void ThrowNotFoundById(long id)
-        {
-            Dictionary<string, List<string>> errors = new()
-                {
-                    { "id", [$"{id}"] }
-                };
-            throw new NotFoundException(errors, $"Student with id {id} not found");
-        }
     }
 }
