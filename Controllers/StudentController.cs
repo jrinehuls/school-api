@@ -4,6 +4,7 @@ using SchoolAPI.Models.DTOs;
 using SchoolAPI.Models.DTOs.Course;
 using SchoolAPI.Models.DTOs.Student;
 using SchoolAPI.Services;
+using SchoolAPI.Services.Impl;
 using System.Net.Mime;
 
 namespace SchoolAPI.Controllers
@@ -79,6 +80,28 @@ namespace SchoolAPI.Controllers
         {
             await _studentService.DeleteStudent(id);
             return NoContent();
+        }
+
+        [HttpPatch("{studentId:long:min(1)}/Enroll-In-Course/{courseId:long:min(1)}", Name = "EnrollInCourse")]
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType<StudentCoursesResponseDto>(200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType<ErrorResponse>(404)]
+        [ProducesResponseType(500)]
+        public async Task<ActionResult<StudentCoursesResponseDto>> EnrollInCourse([FromRoute] long studentId, [FromRoute] long courseId)
+        {
+            return Ok(await _studentService.EnrollInCourse(studentId, courseId));
+        }
+
+        [HttpPatch("{studentId:long:min(1)}/Unenroll-In-Course/{courseId:long:min(1)}", Name = "UnenrollInCourse")]
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType<StudentCoursesResponseDto>(200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType<ErrorResponse>(404)]
+        [ProducesResponseType(500)]
+        public async Task<ActionResult<StudentCoursesResponseDto>> UnenrollInCourse([FromRoute] long studentId, [FromRoute] long courseId)
+        {
+            return Ok(await _studentService.UnenrollInCourse(studentId, courseId));
         }
 
         [HttpGet("{id:long:min(1)}/Courses", Name = "GetEnrolledCourses")]

@@ -20,7 +20,7 @@ namespace SchoolAPI.Services.Impl
 
         public async Task<CourseResponseDto> CreateCourse(CourseRequestDto requestDto)
         {
-            if (await getCourseByCode(requestDto.Code!) is not null)
+            if (await GetCourseByCode(requestDto.Code!) is not null)
             {
                 string code = requestDto.Code!;
                 Dictionary<string, List<string>> errors = new()
@@ -90,7 +90,7 @@ namespace SchoolAPI.Services.Impl
 
         public async Task<CourseResponseDto> UpdateCourse(long id, CourseRequestDto requestDto)
         {
-            Course? sameCodeCourse = await getCourseByCode(requestDto.Code!);
+            Course? sameCodeCourse = await GetCourseByCode(requestDto.Code!);
             Dictionary<string, List<string>> errors = [];
             // Check if a different course with the same Id exists?
             if (sameCodeCourse is not null && sameCodeCourse.Id != id)
@@ -251,7 +251,7 @@ namespace SchoolAPI.Services.Impl
             return studentDtos;
         }
 
-        private async Task<Course?> getCourseByCode(string code)
+        private async Task<Course?> GetCourseByCode(string code)
         {
             Course? course = await _dataContext.Courses.FirstOrDefaultAsync(c => c.Code == code);
             return course;
