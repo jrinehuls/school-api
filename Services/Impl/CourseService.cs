@@ -183,6 +183,74 @@ namespace SchoolAPI.Services.Impl
             return responseDto;
         }
 
+        public async Task<CourseStudentsResponseDto> UnenrollStudent(long courseId, long studentId)
+        {
+            Dictionary<string, List<string>> errors = [];
+            Course? course = await _dataContext.Courses
+                .Include(c => c.Students)
+                .FirstOrDefaultAsync(c => c.Id == courseId);
+            if (course is null)
+            {
+                errors.Add("id", [courseId.ToString()]);
+                throw new NotFoundException(errors, $"Course with id {courseId} not found");
+            }
+
+            Student? student = await _dataContext.Students.FirstOrDefaultAsync(s => s.Id == studentId);
+            if (student is null)
+            {
+                errors.Add("id", [studentId.ToString()]);
+                throw new NotFoundException(errors, $"Student with id {studentId} not found");
+            }
+
+            course.Students.Remove(student);
+            await _dataContext.SaveChangesAsync();
+
+            HashSet<StudentResponseDto> studentDtos = course.Students.Select(s => new StudentResponseDto
+            {
+                Id = s.Id,
+                FirstName = s.FirstName,
+                LastName = s.LastName,
+                Email = s.Email,
+                BirthDate = s.BirthDate
+            }).ToHashSet();
+
+            CourseStudentsResponseDto responseDto = new()
+            {
+                Id = course.Id,
+                Code = course.Code,
+                Name = course.Name,
+                Description = course.Description,
+                CourseStudents = studentDtos
+            };
+
+            return responseDto;
+        }
+
+        public async Task<List<StudentResponseDto>> GetEnrolledStudents(long id)
+        {
+            Course? course = await _dataContext.Courses
+                .Include(c => c.Students)
+                .FirstOrDefaultAsync(c => c.Id == id);
+            if (course is null)
+            {
+                Dictionary<string, List<string>> errors = new()
+                {
+                    { "id", [$"{id}"] }
+                };
+                throw new NotFoundException(errors, $"Course with id {id} not found") ;
+            }
+            List<StudentResponseDto> studentDtos = course.Students
+                .Select(s => new StudentResponseDto
+                {
+                    Id = s.Id,
+                    FirstName = s.FirstName,
+                    LastName = s.LastName,
+                    Email = s.Email,
+                    BirthDate = s.BirthDate
+                }).ToList();
+            return studentDtos;
+        }
+
         private async Task<Course?> getCourseByCode(string code)
         {
             Course? course = await _dataContext.Courses.FirstOrDefaultAsync(c => c.Code == code);

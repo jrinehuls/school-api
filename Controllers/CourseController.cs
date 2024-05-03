@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using SchoolAPI.Filters;
 using SchoolAPI.Models.DTOs;
 using SchoolAPI.Models.DTOs.Course;
+using SchoolAPI.Models.DTOs.Student;
 using SchoolAPI.Services;
 using System.Net.Mime;
 
@@ -79,7 +80,7 @@ namespace SchoolAPI.Controllers
             return NoContent();
         }
 
-        [HttpPatch("{courseId:long:min(1)}/student/{studentId:long:min(1)}")]
+        [HttpPatch("{courseId:long:min(1)}/enroll-student/{studentId:long:min(1)}")]
         [Produces(MediaTypeNames.Application.Json)]
         [ProducesResponseType<CourseStudentsResponseDto>(200)]
         [ProducesResponseType(400)]
@@ -90,5 +91,26 @@ namespace SchoolAPI.Controllers
             return Ok(await _courseService.EnrollStudent(courseId, studentId));
         }
 
+        [HttpPatch("{courseId:long:min(1)}/unenroll-student/{studentId:long:min(1)}")]
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType<CourseStudentsResponseDto>(200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType<ErrorResponse>(404)]
+        [ProducesResponseType(500)]
+        public async Task<ActionResult<CourseStudentsResponseDto>> UnenrollStudent([FromRoute] long courseId, [FromRoute] long studentId)
+        {
+            return Ok(await _courseService.UnenrollStudent(courseId, studentId));
+        }
+
+        [HttpGet("{id:long:min(1)}/students")]
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType<List<StudentResponseDto>>(200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType<ErrorResponse>(404)]
+        [ProducesResponseType(500)]
+        public async Task<ActionResult<List<StudentResponseDto>>> GetEnrolledStudents([FromRoute] long id)
+        {
+            return Ok(await _courseService.GetEnrolledStudents(id));
+        }
     }
 }
