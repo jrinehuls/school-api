@@ -12,30 +12,29 @@ namespace SchoolAPI.Filters
 
         public override void OnException(ExceptionContext context)
         {
-            if (context.Exception is NotFoundException)
+            if (context.Exception is NotFoundException notFound)
             {
-                NotFoundException ex = (NotFoundException)context.Exception;
-                ErrorResponse errorResponse = HandleApiExceptionException(ex);
-                context.Result = new NotFoundObjectResult(errorResponse);
+                ErrorResponse errorResponse = HandleApiException(notFound);
+                ObjectResult result = new (errorResponse)
+                {
+                    StatusCode = notFound.StatusCode
+                };
+                context.Result = result;
             }
-            else if (context.Exception is ConflictException)
+            else if (context.Exception is ConflictException conflict)
             {
-                ConflictException ex = (ConflictException)context.Exception;
-                ErrorResponse errorResponse = HandleApiExceptionException(ex);
+                ErrorResponse errorResponse = HandleApiException(conflict);
                 context.Result = new ConflictObjectResult(errorResponse);
             }
         }
 
-        protected static ErrorResponse HandleApiExceptionException(ApiException exception)
+        protected static ErrorResponse HandleApiException(ApiException exception)
         {
-            ErrorResponse errorResponse = new ErrorResponse();
-            Dictionary<string, List<string>> errors = new()
+            ErrorResponse errorResponse = new()
             {
-                { exception.Field, new List<string>() { exception.Value } }
+                Message = exception.Message,
+                Errors = exception.Errors
             };
-
-            errorResponse.Message = exception.Message;
-            errorResponse.Errors = errors;
 
             return errorResponse;
         }

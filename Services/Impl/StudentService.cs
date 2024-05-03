@@ -35,7 +35,11 @@ namespace SchoolAPI.Services.Impl
             Student? student = await _context.Students.FirstOrDefaultAsync(s => s.Id == id);
             if (student is null)
             {
-                throw new NotFoundException(nameof(student.Id), $"{id}");
+                Dictionary<string, List<string>> errors = new()
+                {
+                    { "id", [$"{id}"] }
+                };
+                throw new NotFoundException(errors, $"Student with id {id} not found");
             }
             StudentResponseDto studentDto = new ()
             {
@@ -52,7 +56,12 @@ namespace SchoolAPI.Services.Impl
         {
             if (await GetStudentByEmail(requestDto.Email) is not null)
             {
-                throw new ConflictException(nameof(requestDto.Email), requestDto.Email);
+                string email = requestDto.Email;
+                Dictionary<string, List<string>> errors = new()
+                {
+                    { "email", [email] }
+                };
+                throw new ConflictException(errors, $"Student with email {email} already exists");
             }
             Student student = new ()
             {
@@ -77,16 +86,21 @@ namespace SchoolAPI.Services.Impl
 
         public async Task<StudentResponseDto> UpdateStudent(long id, StudentRequestDto requestDto)
         {
+            Dictionary<string, List<string>> errors = [];
             Student? student = await _context.Students.FirstOrDefaultAsync(s => s.Id == id);
             if (student == null)
             {
-                throw new NotFoundException(nameof(student.Id), $"{id}");
+                errors.Add("id", [$"{id}"]);
+                throw new NotFoundException(errors, $"Student with id {id} not found");
             }
 
             // If email exists and does not belong to same studnet, throw conflict
             Student? studentWithSameEmail = await GetStudentByEmail(requestDto.Email);
-            if (studentWithSameEmail is not null && studentWithSameEmail.Id != student.Id) {
-                throw new ConflictException(nameof(requestDto.Email), requestDto.Email);
+            if (studentWithSameEmail is not null && studentWithSameEmail.Id != student.Id)
+            {
+                string email = requestDto.Email;
+                errors.Add("email", [email]);
+                throw new ConflictException(errors, $"Student with email {email} already exists");
             }
 
             student.FirstName = requestDto.FirstName;
@@ -113,7 +127,11 @@ namespace SchoolAPI.Services.Impl
             Student? student = await _context.Students.FirstOrDefaultAsync(s => s.Id == id);
             if (student == null)
             {
-                throw new NotFoundException(nameof(student.Id), $"{id}");
+                Dictionary<string, List<string>> errors = new()
+                {
+                    { "id", [$"{id}"] }
+                };
+                throw new NotFoundException(errors, $"Student with id {id} not found");
             }
             _context.Students.Remove(student);
             await _context.SaveChangesAsync();

@@ -5,6 +5,7 @@ using SchoolAPI.Exceptions.NotFound;
 using SchoolAPI.Models.DTOs.Course;
 using SchoolAPI.Models.DTOs.Student;
 using SchoolAPI.Models.Entites;
+using System;
 
 namespace SchoolAPI.Services.Impl
 {
@@ -21,7 +22,12 @@ namespace SchoolAPI.Services.Impl
         {
             if (await getCourseByCode(requestDto.Code!) is not null)
             {
-                throw new ConflictException(nameof(requestDto.Code), requestDto.Code!);
+                string code = requestDto.Code!;
+                Dictionary<string, List<string>> errors = new()
+                {
+                    { "code", [code] }
+                };
+                throw new ConflictException(errors, $"Course with code {code} already exists");
             }
 
             Course course = new()
@@ -64,7 +70,11 @@ namespace SchoolAPI.Services.Impl
             Course? course = await _dataContext.Courses.FirstOrDefaultAsync(c => c.Id == id);
             if (course is null)
             {
-                throw new NotFoundException(nameof(Course.Id), id.ToString());
+                Dictionary<string, List<string>> errors = new ()
+                {
+                    { "id", [id.ToString()]  }
+                };
+                throw new NotFoundException(errors, $"Course with id {id} not found");
             }
 
             CourseResponseDto responseDto = new ()
@@ -81,17 +91,21 @@ namespace SchoolAPI.Services.Impl
         public async Task<CourseResponseDto> UpdateCourse(long id, CourseRequestDto requestDto)
         {
             Course? sameCodeCourse = await getCourseByCode(requestDto.Code!);
+            Dictionary<string, List<string>> errors = [];
             // Check if a different course with the same Id exists?
             if (sameCodeCourse is not null && sameCodeCourse.Id != id)
             {
-                throw new ConflictException(nameof(Course.Code), sameCodeCourse.Code!);
+                string code = sameCodeCourse.Code!;
+                errors.Add("code", [code]);
+                throw new ConflictException(errors, $"Course with code {code} already exists");
             }
 
             Course? course = await _dataContext.Courses.FirstOrDefaultAsync(c => c.Id == id);
 
             if (course is null)
             {
-                throw new NotFoundException(nameof(Course.Id), id.ToString());
+                errors.Add("id", [id.ToString()]);
+                throw new NotFoundException(errors, $"Course with id {id} not found");
             }
 
             course.Code = requestDto.Code;
@@ -116,7 +130,11 @@ namespace SchoolAPI.Services.Impl
             Course? course = await _dataContext.Courses.FirstOrDefaultAsync(c => c.Id == id);
             if (course is null)
             {
-                throw new NotFoundException(nameof(Course.Id), id.ToString());
+                Dictionary<string, List<string>> errors = new()
+                {
+                    { "id", [id.ToString()] }
+                };
+                throw new NotFoundException(errors, $"Course with id {id} not found");
             }
             _dataContext.Courses.Remove(course);
             await _dataContext.SaveChangesAsync();
@@ -124,18 +142,21 @@ namespace SchoolAPI.Services.Impl
 
         public async Task<CourseStudentsResponseDto> EnrollStudent(long courseId, long studentId)
         {
+            Dictionary<string, List<string>> errors = [];
             Course? course = await _dataContext.Courses
                 .Include(c => c.Students)
                 .FirstOrDefaultAsync(c => c.Id == courseId);
             if (course is null)
             {
-                throw new NotFoundException(nameof(Course.Id), courseId.ToString());
+                errors.Add("id", [courseId.ToString()]);
+                throw new NotFoundException(errors, $"Course with id {courseId} not found");
             }
 
             Student? student = await _dataContext.Students.FirstOrDefaultAsync(s => s.Id == studentId);
             if (student is null)
             {
-                throw new NotFoundException(nameof(Student.Id), studentId.ToString());
+                errors.Add("id", [studentId.ToString()]);
+                throw new NotFoundException(errors, $"Student with id {studentId} not found");
             }
 
             course.Students.Add(student);
