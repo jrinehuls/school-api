@@ -1,11 +1,10 @@
 ﻿
 namespace SchoolAPI.Exceptions.NotFound
 {
-    public class NotFoundException : ApiException
+    public abstract class NotFoundException : ApiException
     {
         
-        public NotFoundException(Dictionary<string, List<string>> errors, string message)
-            : base(errors, message)
+        public NotFoundException(string message) : base(message)
         {
             _statusCode = 404;
         }

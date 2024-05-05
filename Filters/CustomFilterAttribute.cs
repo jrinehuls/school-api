@@ -4,6 +4,7 @@ using SchoolAPI.Exceptions.Conflict;
 using SchoolAPI.Exceptions.NotFound;
 using SchoolAPI.Exceptions;
 using SchoolAPI.Models.DTOs;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace SchoolAPI.Filters
 {
@@ -12,35 +13,16 @@ namespace SchoolAPI.Filters
 
         public override void OnException(ExceptionContext context)
         {
-            if (context.Exception is NotFoundException notFound)
+            if (context.Exception is ApiException apiException)
             {
-                ErrorResponse errorResponse = HandleApiException(notFound);
+                ErrorResponse errorResponse = new(apiException.Message);
                 ObjectResult result = new (errorResponse)
                 {
-                    StatusCode = notFound.StatusCode
-                };
-                context.Result = result;
-            }
-            else if (context.Exception is ConflictException conflict)
-            {
-                ErrorResponse errorResponse = HandleApiException(conflict);
-                ObjectResult result = new(errorResponse)
-                {
-                    StatusCode = conflict.StatusCode
+                    StatusCode = apiException.StatusCode
                 };
                 context.Result = result;
             }
         }
 
-        protected static ErrorResponse HandleApiException(ApiException exception)
-        {
-            ErrorResponse errorResponse = new()
-            {
-                Message = exception.Message,
-                Errors = exception.Errors
-            };
-
-            return errorResponse;
-        }
     }
 }

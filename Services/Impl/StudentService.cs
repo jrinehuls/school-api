@@ -11,20 +11,16 @@ namespace SchoolAPI.Services.Impl
     public class StudentService : IStudentService
     {
 
-        private readonly DataContext _context;
-        private readonly IEntityFinder<Student, long> _studentFinder;
-        private readonly IEntityFinder<Course, long> _courseFinder;
+        private readonly DataContext _dataContext;
 
-        public StudentService(DataContext context, IEntityFinder<Student, long> studentFinder, IEntityFinder<Course, long> courseFinder)
+        public StudentService(DataContext dataContext)
         {
-            _context = context;
-            _studentFinder = studentFinder;
-            _courseFinder = courseFinder;
+            _dataContext = dataContext;
         }
 
         public async Task<List<StudentResponseDto>> GetStudents()
         {
-            List<StudentResponseDto> dtos = await _context.Students.Select(s => new StudentResponseDto()
+            List<StudentResponseDto> dtos = await _dataContext.Students.Select(s => new StudentResponseDto()
             {
                 Id = s.Id,
                 FirstName = s.FirstName,
@@ -37,7 +33,7 @@ namespace SchoolAPI.Services.Impl
 
         public async Task<StudentResponseDto> GetStudentById(long id)
         {
-            Student student = await _studentFinder.FindEntityByIdOrThrow(id);
+            Student student = await FindByIdOrThrow(id);
             StudentResponseDto studentDto = new ()
             {
                 Id = student.Id,
@@ -53,7 +49,7 @@ namespace SchoolAPI.Services.Impl
         {
             if (await GetStudentByEmail(requestDto.Email) is not null)
             {
-                ThrowStudentEmailConflict(requestDto.Email);
+                throw new StudentConflictException("email", requestDto.Email);
             }
             Student student = new ()
             {
@@ -62,8 +58,8 @@ namespace SchoolAPI.Services.Impl
                 Email = requestDto.Email,
                 BirthDate = requestDto.BirthDate
             };
-            _context.Students.Add(student);
-            await _context.SaveChangesAsync();
+            _dataContext.Students.Add(student);
+            await _dataContext.SaveChangesAsync();
 
             StudentResponseDto studentDto = new ()
             {
@@ -78,13 +74,12 @@ namespace SchoolAPI.Services.Impl
 
         public async Task<StudentResponseDto> UpdateStudent(long id, StudentRequestDto requestDto)
         {
-            Student student = await _studentFinder.FindEntityByIdOrThrow(id);
-
-            // If email exists and does not belong to same studnet, throw conflict
+            Student student = await FindByIdOrThrow(id);
             Student? studentWithSameEmail = await GetStudentByEmail(requestDto.Email);
+            // If email exists and does not belong to same student, throw conflict
             if (studentWithSameEmail is not null && studentWithSameEmail.Id != student.Id)
             {
-                ThrowStudentEmailConflict(requestDto.Email);
+                throw new StudentConflictException("email", studentWithSameEmail.Email);
             }
 
             student.FirstName = requestDto.FirstName;
@@ -92,7 +87,7 @@ namespace SchoolAPI.Services.Impl
             student.Email = requestDto.Email;
             student.BirthDate = requestDto.BirthDate;
 
-            await _context.SaveChangesAsync();
+            await _dataContext.SaveChangesAsync();
 
             StudentResponseDto responseDto = new()
             {
@@ -108,18 +103,28 @@ namespace SchoolAPI.Services.Impl
 
         public async Task DeleteStudent(long id)
         {
-            Student student = await _studentFinder.FindEntityByIdOrThrow(id);
-            _context.Students.Remove(student);
-            await _context.SaveChangesAsync();
+            Student student = await FindByIdOrThrow(id);
+            _dataContext.Students.Remove(student);
+            await _dataContext.SaveChangesAsync();
         }
 
         public async Task<StudentCoursesResponseDto> EnrollInCourse(long studentId, long courseId)
         {
-            Student student = await GetStudentByIdWithCoursesOrThrow(studentId);
-            Course course = await _courseFinder.FindEntityByIdOrThrow(courseId);
+            Student student = await FindByIdWithCoursesOrThrow(studentId);
+
+            Course? course = await _dataContext.Courses.FirstOrDefaultAsync(c => c.Id == courseId);
+            if (course is null)
+            {
+                throw new CourseNotFoundException(courseId);
+            }
+
+            if (student.Courses.Contains(course))
+            {
+                throw new StudentAlreadyEnrolledException(studentId, courseId);
+            }
 
             student.Courses.Add(course);
-            await _context.SaveChangesAsync();
+            await _dataContext.SaveChangesAsync();
 
             HashSet<CourseResponseDto> courseDtos = student.Courses
                 .Select(c => new CourseResponseDto()
@@ -145,12 +150,21 @@ namespace SchoolAPI.Services.Impl
 
         public async Task<StudentCoursesResponseDto> UnenrollInCourse(long studentId, long courseId)
         {
-            Student student = await GetStudentByIdWithCoursesOrThrow(studentId);
-            Course course = await _courseFinder.FindEntityByIdOrThrow(courseId);
+            Student student = await FindByIdWithCoursesOrThrow(studentId);
 
-            // TODO: Check if student contains course and if not, throw StudentNotEnrolledException.
+            Course? course = await _dataContext.Courses.FirstOrDefaultAsync(c => c.Id == courseId);
+            if (course is null)
+            {
+                throw new CourseNotFoundException(courseId);
+            }
+
+            if (!student.Courses.Contains(course))
+            {
+                throw new StudentNotEnrolledException(studentId, courseId);
+            }
+
             student.Courses.Remove(course);
-            await _context.SaveChangesAsync();
+            await _dataContext.SaveChangesAsync();
 
             HashSet<CourseResponseDto> courseDtos = student.Courses
                 .Select(c => new CourseResponseDto()
@@ -176,7 +190,8 @@ namespace SchoolAPI.Services.Impl
 
         public async Task<List<CourseResponseDto>> GetEnrolledCourses(long id)
         {
-            Student student = await GetStudentByIdWithCoursesOrThrow(id);
+            Student student = await FindByIdWithCoursesOrThrow(id);
+
             List<CourseResponseDto> courseDtos = student.Courses
                 .Select(c => new CourseResponseDto
                 {
@@ -192,38 +207,30 @@ namespace SchoolAPI.Services.Impl
         // -------------------------------- Private Methods --------------------------------
         private async Task<Student?> GetStudentByEmail(string email)
         {
-            Student? student = await _context.Students.FirstOrDefaultAsync(student => student.Email == email);
+            Student? student = await _dataContext.Students.FirstOrDefaultAsync(student => student.Email == email);
             return student;
         }
 
-        private async Task<Student> GetStudentByIdWithCoursesOrThrow(long id)
+        private async Task<Student> FindByIdOrThrow(long id)
         {
-            Student? student = await _context.Students
+            Student? student = await _dataContext.Students.FirstOrDefaultAsync(s => s.Id == id);
+            if (student is null)
+            {
+                throw new StudentNotFoundException(id);
+            }
+            return student;
+        }
+
+        private async Task<Student> FindByIdWithCoursesOrThrow(long id)
+        {
+            Student? student = await _dataContext.Students
                 .Include(s => s.Courses)
                 .FirstOrDefaultAsync(s => s.Id == id);
             if (student is null)
             {
-                ThrowNotFoundById(id);
+                throw new StudentNotFoundException(id);
             }
-            return student!;
-        }
-
-        private static void ThrowNotFoundById(long id)
-        {
-            Dictionary<string, List<string>> errors = new()
-                {
-                    { "id", [$"{id}"] }
-                };
-            throw new NotFoundException(errors, $"Student with id {id} not found");
-        }
-
-        private static void ThrowStudentEmailConflict(string email)
-        {
-            Dictionary<string, List<string>> errors = new()
-                {
-                    { "email", [$"{email}"] }
-                };
-            throw new ConflictException(errors, $"Student with email {email} already exists");
+            return student;
         }
 
     }

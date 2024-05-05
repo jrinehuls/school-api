@@ -12,21 +12,17 @@ namespace SchoolAPI.Services.Impl
     public class CourseService : ICourseService
     {
         private readonly DataContext _dataContext;
-        private readonly IEntityFinder<Course, long> _courseFinder;
-        private readonly IEntityFinder<Student, long> _studentFinder;
 
-        public CourseService(DataContext dataContext, IEntityFinder<Course, long> courseFinder, IEntityFinder<Student, long> studentFinder)
+        public CourseService(DataContext dataContext)
         {
             _dataContext = dataContext;
-            _courseFinder = courseFinder;
-            _studentFinder = studentFinder;
         }
 
         public async Task<CourseResponseDto> CreateCourse(CourseRequestDto requestDto)
         {
             if (await GetCourseByCode(requestDto.Code) is not null)
             {
-                ThrowCourseCodeConflict(requestDto.Code);
+                throw new CourseConflictException("code", requestDto.Code);
             }
 
             Course course = new()
@@ -66,7 +62,7 @@ namespace SchoolAPI.Services.Impl
 
         public async Task<CourseResponseDto> GetCourseById(long id)
         {
-            Course course = await _courseFinder.FindEntityByIdOrThrow(id);
+            Course course = await FindByIdOrThrow(id);
             CourseResponseDto responseDto = new ()
             {
                 Id = course.Id,
@@ -80,14 +76,13 @@ namespace SchoolAPI.Services.Impl
 
         public async Task<CourseResponseDto> UpdateCourse(long id, CourseRequestDto requestDto)
         {
-            Course? sameCodeCourse = await GetCourseByCode(requestDto.Code);
-            // Check if a different course with the same Id exists?
-            if (sameCodeCourse is not null && sameCodeCourse.Id != id)
+            Course course = await FindByIdOrThrow(id);
+            Course? courseWithSameCode = await GetCourseByCode(requestDto.Code);
+            // If code exists and does not belong to same course, throw conflict
+            if (courseWithSameCode is not null && courseWithSameCode.Id != course.Id)
             {
-                ThrowCourseCodeConflict(requestDto.Code);
+                throw new CourseConflictException("code", courseWithSameCode.Code);
             }
-
-            Course course = await _courseFinder.FindEntityByIdOrThrow(id);
 
             course.Code = requestDto.Code;
             course.Name = requestDto.Name;
@@ -108,27 +103,38 @@ namespace SchoolAPI.Services.Impl
 
         public async Task DeleteCourse(long id)
         {
-            Course course = await _courseFinder.FindEntityByIdOrThrow(id);
+            Course course = await FindByIdOrThrow(id);
             _dataContext.Courses.Remove(course);
             await _dataContext.SaveChangesAsync();
         }
 
         public async Task<CourseStudentsResponseDto> EnrollStudent(long courseId, long studentId)
         {
-            Course course = await GetCourseByIdWithStudentsOrThrow(courseId);
-            Student student = await _studentFinder.FindEntityByIdOrThrow(studentId);
+            Course course = await FindByIdWithStudentsOrThrow(courseId);
+
+            Student? student = await _dataContext.Students.FirstOrDefaultAsync(s => s.Id == studentId);
+            if (student is null)
+            {
+                throw new StudentNotFoundException(studentId);
+            }
+
+            if (course.Students.Contains(student))
+            {
+                throw new StudentAlreadyEnrolledException(studentId, courseId);
+            }
 
             course.Students.Add(student);
             await _dataContext.SaveChangesAsync();
 
-            HashSet<StudentResponseDto> studentDtos = course.Students.Select(s => new StudentResponseDto
-            {
-                Id = s.Id,
-                FirstName = s.FirstName,
-                LastName = s.LastName,
-                Email = s.Email,
-                BirthDate = s.BirthDate
-            }).ToHashSet();
+            HashSet<StudentResponseDto> studentDtos = course.Students
+                .Select(s => new StudentResponseDto
+                {
+                    Id = s.Id,
+                    FirstName = s.FirstName,
+                    LastName = s.LastName,
+                    Email = s.Email,
+                    BirthDate = s.BirthDate
+                }).ToHashSet();
 
             CourseStudentsResponseDto responseDto = new()
             {
@@ -144,21 +150,31 @@ namespace SchoolAPI.Services.Impl
 
         public async Task<CourseStudentsResponseDto> UnenrollStudent(long courseId, long studentId)
         {
-            Course course = await GetCourseByIdWithStudentsOrThrow(courseId);
-            Student student = await _studentFinder.FindEntityByIdOrThrow(studentId);
+            Course course = await FindByIdWithStudentsOrThrow(courseId);
 
-            // TODO: Check if course contains student and if not, throw StudentNotEnrolledException.
+            Student? student = await _dataContext.Students.FirstOrDefaultAsync(s => s.Id == studentId);
+            if (student is null)
+            {
+                throw new StudentNotFoundException(studentId);
+            }
+
+            if (!course.Students.Contains(student))
+            {
+                throw new StudentNotEnrolledException(studentId, courseId);
+            }
+
             course.Students.Remove(student);
             await _dataContext.SaveChangesAsync();
 
-            HashSet<StudentResponseDto> studentDtos = course.Students.Select(s => new StudentResponseDto
-            {
-                Id = s.Id,
-                FirstName = s.FirstName,
-                LastName = s.LastName,
-                Email = s.Email,
-                BirthDate = s.BirthDate
-            }).ToHashSet();
+            HashSet<StudentResponseDto> studentDtos = course.Students
+                .Select(s => new StudentResponseDto
+                {
+                    Id = s.Id,
+                    FirstName = s.FirstName,
+                    LastName = s.LastName,
+                    Email = s.Email,
+                    BirthDate = s.BirthDate
+                }).ToHashSet();
 
             CourseStudentsResponseDto responseDto = new()
             {
@@ -174,7 +190,7 @@ namespace SchoolAPI.Services.Impl
 
         public async Task<List<StudentResponseDto>> GetEnrolledStudents(long id)
         {
-            Course course = await GetCourseByIdWithStudentsOrThrow(id);
+            Course course = await FindByIdWithStudentsOrThrow(id);
             List<StudentResponseDto> studentDtos = course.Students
                 .Select(s => new StudentResponseDto
                 {
@@ -194,34 +210,26 @@ namespace SchoolAPI.Services.Impl
             return course;
         }
 
-        private async Task<Course> GetCourseByIdWithStudentsOrThrow(long id)
+        private async Task<Course> FindByIdOrThrow(long id)
+        {
+            Course? course = await _dataContext.Courses.FirstOrDefaultAsync(c => c.Id == id);
+            if (course is null)
+            {
+                throw new CourseNotFoundException(id);
+            }
+            return course;
+        }
+
+        private async Task<Course> FindByIdWithStudentsOrThrow(long id)
         {
             Course? course = await _dataContext.Courses
                 .Include(c => c.Students)
-                .FirstOrDefaultAsync(c => c.Id == id);
+                .FirstOrDefaultAsync(s => s.Id == id);
             if (course is null)
             {
-                ThrowNotFoundById(id);
+                throw new CourseNotFoundException(id);
             }
-            return course!;
-        }
-
-        private static void ThrowNotFoundById(long id)
-        {
-            Dictionary<string, List<string>> errors = new()
-                {
-                    { "id", [$"{id}"] }
-                };
-            throw new NotFoundException(errors, $"Course with id {id} not found");
-        }
-
-        private static void ThrowCourseCodeConflict(string code)
-        {
-            Dictionary<string, List<string>> errors = new()
-                {
-                    { "code", [code] }
-                };
-            throw new ConflictException(errors, $"Course with code {code} already exists");
+            return course;
         }
 
     }

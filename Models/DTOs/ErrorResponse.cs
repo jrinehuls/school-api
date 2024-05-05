@@ -2,7 +2,9 @@
 {
     public class ErrorResponse
     {
-        public string? Message { get; set; } = null;
-        public Dictionary<string, List<string>>? Errors { get; set; } = new Dictionary<string, List<string>>();
+        public ErrorResponse(string message) { 
+            Message = message;
+        }
+        public string Message { get; set; }
     }
 }
