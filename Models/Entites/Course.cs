@@ -25,5 +25,7 @@ namespace SchoolAPI.Models.Entites
         public string Description { get; set; } = null!;
 
         public HashSet<Student> Students { get; set; } = [];
+
+        public HashSet<Grade> Grades { get; set; } = [];
     }
 }

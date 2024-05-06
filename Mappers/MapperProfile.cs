@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using SchoolAPI.Models.DTOs.Course;
+using SchoolAPI.Models.DTOs.Grade;
 using SchoolAPI.Models.DTOs.Student;
 using SchoolAPI.Models.Entites;
 
@@ -16,6 +17,9 @@ namespace SchoolAPI.Mappers
             CreateMap<Course, CourseResponseDto>();
             CreateMap<CourseRequestDto, Course>();
             CreateMap<Course, CourseStudentsResponseDto>();
+
+            CreateMap<Grade, GradeResponseDto>();
+            CreateMap<GradeRequestDto, Grade>();
         }
 
     }

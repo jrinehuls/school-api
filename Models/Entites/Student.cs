@@ -27,5 +27,7 @@ namespace SchoolAPI.Models.Entites
         public DateTime? BirthDate { get; set; }
 
         public HashSet<Course> Courses { get; set; } = [];
+
+        public HashSet<Grade> Grades { get; set; } = [];
     }
 }

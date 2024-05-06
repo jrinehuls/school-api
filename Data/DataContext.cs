@@ -8,6 +8,7 @@ namespace SchoolAPI.Data
     {
         public DbSet<Student> Students { get; set; }
         public DbSet<Course> Courses { get; set; }
+        public DbSet<Grade> Grades { get; set; }
         
         public DataContext(DbContextOptions<DataContext> options) : base(options)
         {
@@ -17,6 +18,7 @@ namespace SchoolAPI.Data
         {
             modelBuilder.ApplyConfiguration(new StudentConfig());
             modelBuilder.ApplyConfiguration(new CourseConfig());
+            modelBuilder.ApplyConfiguration(new GradeConfig());
         }
 
     }

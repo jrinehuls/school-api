@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SchoolAPI.Data;
 
@@ -11,9 +12,11 @@ using SchoolAPI.Data;
 namespace SchoolAPI.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20240506015244_AddGradeTable")]
+    partial class AddGradeTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -34,7 +37,7 @@ namespace SchoolAPI.Migrations
 
                     b.HasIndex("StudentsId");
 
-                    b.ToTable("CourseStudent", (string)null);
+                    b.ToTable("CourseStudent");
                 });
 
             modelBuilder.Entity("SchoolAPI.Models.Entites.Course", b =>
@@ -65,7 +68,7 @@ namespace SchoolAPI.Migrations
                     b.HasIndex("Code")
                         .IsUnique();
 
-                    b.ToTable("Courses", (string)null);
+                    b.ToTable("Courses");
                 });
 
             modelBuilder.Entity("SchoolAPI.Models.Entites.Grade", b =>
@@ -93,7 +96,7 @@ namespace SchoolAPI.Migrations
 
                     b.HasIndex("StudentId");
 
-                    b.ToTable("Grades", (string)null);
+                    b.ToTable("Grades");
                 });
 
             modelBuilder.Entity("SchoolAPI.Models.Entites.Student", b =>
@@ -127,7 +130,7 @@ namespace SchoolAPI.Migrations
                     b.HasIndex("Email")
                         .IsUnique();
 
-                    b.ToTable("Students", (string)null);
+                    b.ToTable("Students");
 
                     b.HasData(
                         new
