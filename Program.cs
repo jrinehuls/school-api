@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using SchoolAPI.Data;
+using SchoolAPI.Mappers;
 using SchoolAPI.Models.Entites;
 using SchoolAPI.Services;
 using SchoolAPI.Services.Impl;
@@ -12,6 +13,7 @@ builder.Services.AddDbContext<DataContext>(options =>
 builder.Services.AddScoped<IStudentService, StudentService>();
 builder.Services.AddScoped<ICourseService, CourseService>();
 builder.Services.AddControllers().AddNewtonsoftJson();
+builder.Services.AddAutoMapper(typeof(MapperProfile));
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

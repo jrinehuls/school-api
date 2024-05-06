@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using SchoolAPI.Data;
 using SchoolAPI.Exceptions.Conflict;
 using SchoolAPI.Exceptions.NotFound;
@@ -12,10 +13,12 @@ namespace SchoolAPI.Services.Impl
     public class CourseService : ICourseService
     {
         private readonly DataContext _dataContext;
+        private readonly IMapper _mapper;
 
-        public CourseService(DataContext dataContext)
+        public CourseService(DataContext dataContext, IMapper mapper)
         {
             _dataContext = dataContext;
+            _mapper = mapper;
         }
 
         public async Task<CourseResponseDto> CreateCourse(CourseRequestDto requestDto)
@@ -25,23 +28,12 @@ namespace SchoolAPI.Services.Impl
                 throw new CourseConflictException("code", requestDto.Code);
             }
 
-            Course course = new()
-            {
-                Code = requestDto.Code,
-                Name = requestDto.Name,
-                Description = requestDto.Description
-            };
+            Course course = _mapper.Map<Course>(requestDto)!;
 
             _dataContext.Add(course);
             await _dataContext.SaveChangesAsync();
 
-            CourseResponseDto responseDto = new()
-            {
-                Id = course.Id,
-                Code = course.Code,
-                Name = course.Name,
-                Description = course.Description,
-            };
+            CourseResponseDto responseDto = _mapper.Map<CourseResponseDto>(course)!;
 
             return responseDto;
         }
@@ -49,13 +41,7 @@ namespace SchoolAPI.Services.Impl
         public async Task<List<CourseResponseDto>> GetAllCourses()
         {
             List<CourseResponseDto> responseDtos = await _dataContext.Courses
-                .Select(c => new CourseResponseDto()
-                    {
-                        Id = c.Id,
-                        Code = c.Code,
-                        Name = c.Name,
-                        Description = c.Description
-                    })
+                .Select(c => _mapper.Map<CourseResponseDto>(c)!)
                 .ToListAsync();
             return responseDtos;
         }
@@ -63,13 +49,7 @@ namespace SchoolAPI.Services.Impl
         public async Task<CourseResponseDto> GetCourseById(long id)
         {
             Course course = await FindByIdOrThrow(id);
-            CourseResponseDto responseDto = new ()
-            {
-                Id = course.Id,
-                Code = course.Code,
-                Name = course.Name,
-                Description = course.Description,
-            };
+            CourseResponseDto responseDto = _mapper.Map<CourseResponseDto>(course)!;
 
             return responseDto;
         }
@@ -90,13 +70,7 @@ namespace SchoolAPI.Services.Impl
 
             await _dataContext.SaveChangesAsync();
 
-            CourseResponseDto responseDto = new ()
-            {
-                Id = course.Id,
-                Code = course.Code,
-                Name = course.Name,
-                Description = course.Description
-            };
+            CourseResponseDto responseDto = _mapper.Map<CourseResponseDto>(course)!;
 
             return responseDto;
         }
@@ -126,24 +100,7 @@ namespace SchoolAPI.Services.Impl
             course.Students.Add(student);
             await _dataContext.SaveChangesAsync();
 
-            HashSet<StudentResponseDto> studentDtos = course.Students
-                .Select(s => new StudentResponseDto
-                {
-                    Id = s.Id,
-                    FirstName = s.FirstName,
-                    LastName = s.LastName,
-                    Email = s.Email,
-                    BirthDate = s.BirthDate
-                }).ToHashSet();
-
-            CourseStudentsResponseDto responseDto = new()
-            {
-                Id = course.Id,
-                Code = course.Code,
-                Name = course.Name,
-                Description = course.Description,
-                Students = studentDtos
-            };
+            CourseStudentsResponseDto responseDto = _mapper.Map<CourseStudentsResponseDto>(course)!;
 
             return responseDto;
         }
@@ -166,24 +123,7 @@ namespace SchoolAPI.Services.Impl
             course.Students.Remove(student);
             await _dataContext.SaveChangesAsync();
 
-            HashSet<StudentResponseDto> studentDtos = course.Students
-                .Select(s => new StudentResponseDto
-                {
-                    Id = s.Id,
-                    FirstName = s.FirstName,
-                    LastName = s.LastName,
-                    Email = s.Email,
-                    BirthDate = s.BirthDate
-                }).ToHashSet();
-
-            CourseStudentsResponseDto responseDto = new()
-            {
-                Id = course.Id,
-                Code = course.Code,
-                Name = course.Name,
-                Description = course.Description,
-                Students = studentDtos
-            };
+            CourseStudentsResponseDto responseDto = _mapper.Map<CourseStudentsResponseDto>(course)!;
 
             return responseDto;
         }
@@ -192,14 +132,7 @@ namespace SchoolAPI.Services.Impl
         {
             Course course = await FindByIdWithStudentsOrThrow(id);
             List<StudentResponseDto> studentDtos = course.Students
-                .Select(s => new StudentResponseDto
-                {
-                    Id = s.Id,
-                    FirstName = s.FirstName,
-                    LastName = s.LastName,
-                    Email = s.Email,
-                    BirthDate = s.BirthDate
-                }).ToList();
+                .Select(s => _mapper.Map<StudentResponseDto>(s)!).ToList();
             return studentDtos;
         }
 

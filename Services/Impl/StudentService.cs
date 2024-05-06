@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using SchoolAPI.Data;
 using SchoolAPI.Exceptions.Conflict;
 using SchoolAPI.Exceptions.NotFound;
@@ -12,36 +13,26 @@ namespace SchoolAPI.Services.Impl
     {
 
         private readonly DataContext _dataContext;
+        private readonly IMapper _mapper;
 
-        public StudentService(DataContext dataContext)
+        public StudentService(DataContext dataContext, IMapper mapper)
         {
             _dataContext = dataContext;
+            _mapper = mapper;
         }
 
         public async Task<List<StudentResponseDto>> GetStudents()
         {
-            List<StudentResponseDto> dtos = await _dataContext.Students.Select(s => new StudentResponseDto()
-            {
-                Id = s.Id,
-                FirstName = s.FirstName,
-                LastName = s.LastName,
-                Email = s.Email,
-                BirthDate = s.BirthDate
-            }).ToListAsync();
+            List<StudentResponseDto> dtos = await _dataContext.Students
+                .Select(s => _mapper.Map<StudentResponseDto>(s)!)
+                .ToListAsync();
             return dtos;
         }
 
         public async Task<StudentResponseDto> GetStudentById(long id)
         {
             Student student = await FindByIdOrThrow(id);
-            StudentResponseDto studentDto = new ()
-            {
-                Id = student.Id,
-                FirstName = student.FirstName,
-                LastName = student.LastName,
-                Email = student.Email,
-                BirthDate = student.BirthDate
-            };
+            StudentResponseDto studentDto = _mapper.Map<StudentResponseDto>(student)!;
             return studentDto;
         }
 
@@ -51,24 +42,12 @@ namespace SchoolAPI.Services.Impl
             {
                 throw new StudentConflictException("email", requestDto.Email);
             }
-            Student student = new ()
-            {
-                FirstName = requestDto.FirstName,
-                LastName = requestDto.LastName,
-                Email = requestDto.Email,
-                BirthDate = requestDto.BirthDate
-            };
+
+            Student student = _mapper.Map<Student>(requestDto)!;
             _dataContext.Students.Add(student);
             await _dataContext.SaveChangesAsync();
 
-            StudentResponseDto studentDto = new ()
-            {
-                Id = student.Id,
-                FirstName = student.FirstName,
-                LastName = student.LastName,
-                Email = student.Email,
-                BirthDate = student.BirthDate
-            };
+            StudentResponseDto studentDto = _mapper.Map<StudentResponseDto>(student)!;
             return studentDto;
         }
 
@@ -86,17 +65,10 @@ namespace SchoolAPI.Services.Impl
             student.LastName = requestDto.LastName;
             student.Email = requestDto.Email;
             student.BirthDate = requestDto.BirthDate;
-
+            
             await _dataContext.SaveChangesAsync();
 
-            StudentResponseDto responseDto = new()
-            {
-                Id = student.Id,
-                FirstName = student.FirstName,
-                LastName = student.LastName,
-                Email = student.Email,
-                BirthDate = student.BirthDate
-            };
+            StudentResponseDto responseDto = _mapper.Map<StudentResponseDto>(student)!;
 
             return responseDto;
         }
@@ -126,24 +98,7 @@ namespace SchoolAPI.Services.Impl
             student.Courses.Add(course);
             await _dataContext.SaveChangesAsync();
 
-            HashSet<CourseResponseDto> courseDtos = student.Courses
-                .Select(c => new CourseResponseDto()
-                {
-                    Id = c.Id,
-                    Code = c.Code,
-                    Name = c.Name,
-                    Description = c.Description
-                }).ToHashSet();
-
-            StudentCoursesResponseDto responseDto = new()
-            {
-                Id = studentId,
-                FirstName = student.FirstName,
-                LastName = student.LastName,
-                Email = student.Email,
-                BirthDate = student.BirthDate,
-                Courses = courseDtos
-            };
+            StudentCoursesResponseDto responseDto = _mapper.Map<StudentCoursesResponseDto>(student)!;
 
             return responseDto;
         }
@@ -166,24 +121,7 @@ namespace SchoolAPI.Services.Impl
             student.Courses.Remove(course);
             await _dataContext.SaveChangesAsync();
 
-            HashSet<CourseResponseDto> courseDtos = student.Courses
-                .Select(c => new CourseResponseDto()
-                {
-                    Id = c.Id,
-                    Code = c.Code,
-                    Name = c.Name,
-                    Description = c.Description
-                }).ToHashSet();
-
-            StudentCoursesResponseDto responseDto = new()
-            {
-                Id = studentId,
-                FirstName = student.FirstName,
-                LastName = student.LastName,
-                Email = student.Email,
-                BirthDate = student.BirthDate,
-                Courses = courseDtos
-            };
+            StudentCoursesResponseDto responseDto = _mapper.Map<StudentCoursesResponseDto>(student)!;
 
             return responseDto;
         }
@@ -193,14 +131,9 @@ namespace SchoolAPI.Services.Impl
             Student student = await FindByIdWithCoursesOrThrow(id);
 
             List<CourseResponseDto> courseDtos = student.Courses
-                .Select(c => new CourseResponseDto
-                {
-                    Id = c.Id,
-                    Code = c.Code,
-                    Name = c.Name,
-                    Description = c.Description
-                })
+                .Select(c => _mapper.Map<CourseResponseDto>(c)!)
                 .ToList();
+
             return courseDtos;
         }
 
