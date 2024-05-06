@@ -8,6 +8,7 @@ namespace SchoolAPI.Data.Config
     {
         public void Configure(EntityTypeBuilder<Grade> builder)
         {
+
             return;
         }
     }
