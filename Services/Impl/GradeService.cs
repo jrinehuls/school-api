@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using SchoolAPI.Data;
+using SchoolAPI.Exceptions.Conflict;
 using SchoolAPI.Exceptions.NotFound;
 using SchoolAPI.Models.DTOs.Grade;
 using SchoolAPI.Models.Entites;
@@ -28,12 +29,25 @@ namespace SchoolAPI.Services.Impl
 
             Student student = await FindStudnetByIdOrThrow(studentId);
             Course course = await FindCourseByIdOrThrow(courseId);
+            Grade? existingGrade = await _dataContext.Grades
+                .FirstOrDefaultAsync(g => g.Student.Id == studentId && g.Course.Id == courseId);
+            if (existingGrade is not null)
+            {
+                throw new GradeConflictException(studentId, courseId);
+            }
+
             Grade grade = new ()
             {
                 Score = requestDto.Score,
                 Student = student,
                 Course = course,
             };
+
+            _dataContext.Grades.Add(grade);
+            await _dataContext.SaveChangesAsync();
+
+            GradeResponseDto responseDto = _mapper.Map<GradeResponseDto>(grade)!;
+            return responseDto;
         }
 
         public async Task<GradeResponseDto> GetGrade(long studentId, long courseId)

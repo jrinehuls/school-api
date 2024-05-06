@@ -33,14 +33,14 @@ namespace SchoolAPI.Validators
             return null;
         }
 
-        private string SetDefaultErrorMessage()
+        private static string SetDefaultErrorMessage()
         {
             string message = "The value must be one of the following: ";
             for (int i = 0; i < scores.Length - 1; i++)
             {
                 message += scores[i] + ", ";
             }
-            message += scores[scores.Length];
+            message += scores[scores.Length - 1];
 
             return message;
         }

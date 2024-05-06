@@ -4,14 +4,14 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SchoolAPI.Models.Entites
 {
-    //[Index("StudentId", "CourseId", IsUnique = true)]
+    [Index("StudentId", "CourseId", IsUnique = true)]
     public class Grade
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long Id { get; set; }
 
-        [Required]
+        [Required(AllowEmptyStrings = false)]
         [StringLength(2)]
         public string Score { get; set; } = null!;
 
