@@ -93,23 +93,31 @@ namespace SchoolAPI.Services.Impl
                     course => course.Id,
                     (grade, course) => new CourseGradeResponseDto()
                     {
-                        Score = grade.Score,
-                        Course = _mapper.Map<CourseResponseDto>(course)!
+                        Id = course.Id,
+                        Code = course.Code,
+                        Name = course.Name,
+                        Description = course.Description,
+                        Grade = _mapper.Map<GradeScoreResponseDto>(grade)!
                     }).ToHashSet();
 
             StudentGradesResponseDto responseDto = new()
             {
-                Student = _mapper.Map<StudentResponseDto>(student)!,
+                Id = student.Id,
+                FirstName = student.FirstName,
+                LastName = student.LastName,
+                Email = student.Email,
+                BirthDate = student.BirthDate,
                 Grades = courseGrades
             };
 
             return responseDto;
         }
 
+        /*
         public async Task<CourseGradesResponseDto> GetGradesByCourseId(long courseId)
         {
             throw new NotImplementedException();
-        }
+        }*/
 
         // ----------------------------- Private Methods -----------------------------
 

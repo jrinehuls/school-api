@@ -1,4 +1,5 @@
 ﻿using SchoolAPI.Models.DTOs.Grade;
+using SchoolAPI.Models.DTOs.Student;
 
 namespace SchoolAPI.Services
 {
@@ -9,6 +10,6 @@ namespace SchoolAPI.Services
         public Task<GradeResponseDto> UpdateGrade(GradeRequestDto requestDto, long studentId, long courseId);
         public Task DeleteGrade(long studentId, long courseId);
         public Task<StudentGradesResponseDto> GetGradesByStudentId(long studentId);
-        public Task<CourseGradesResponseDto> GetGradesByCourseId(long courseId);
+        //public Task<CourseGradesResponseDto> GetGradesByCourseId(long courseId);
     }
 }

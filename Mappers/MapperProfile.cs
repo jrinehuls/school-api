@@ -19,6 +19,7 @@ namespace SchoolAPI.Mappers
             CreateMap<Course, CourseStudentsResponseDto>();
 
             CreateMap<Grade, GradeResponseDto>();
+            CreateMap<Grade, GradeScoreResponseDto>();
         }
 
     }

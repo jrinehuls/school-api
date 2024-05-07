@@ -1,10 +1,9 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.JSInterop.Infrastructure;
 using SchoolAPI.Filters;
 using SchoolAPI.Models.DTOs;
 using SchoolAPI.Models.DTOs.Grade;
-using SchoolAPI.Models.Entites;
+using SchoolAPI.Models.DTOs.Student;
 using SchoolAPI.Services;
 using System.Net.Mime;
 
