@@ -8,5 +8,7 @@ namespace SchoolAPI.Services
         public Task<GradeResponseDto> GetGrade(long studentId, long courseId);
         public Task<GradeResponseDto> UpdateGrade(GradeRequestDto requestDto, long studentId, long courseId);
         public Task DeleteGrade(long studentId, long courseId);
+        public Task<StudentGradesResponseDto> GetGradesByStudentId(long studentId);
+        public Task<CourseGradesResponseDto> GetGradesByCourseId(long courseId);
     }
 }

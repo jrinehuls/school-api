@@ -12,21 +12,16 @@ namespace SchoolAPI.Services.Impl
     {
 
         private readonly DataContext _dataContext;
-        private readonly IStudentService _studentService;
-        private readonly ICourseService _courseService;
         private readonly IMapper _mapper;
 
-        public GradeService(DataContext dataContext, IStudentService studentService, ICourseService courseService, IMapper mapper)
+        public GradeService(DataContext dataContext, IMapper mapper)
         {
             _dataContext = dataContext;
-            _studentService = studentService;
-            _courseService = courseService;
             _mapper = mapper;
         }
 
         public async Task<GradeResponseDto> CreateGrade(GradeRequestDto requestDto, long studentId, long courseId)
         {
-
             Student student = await FindStudnetByIdOrThrow(studentId);
             Course course = await FindCourseByIdOrThrow(courseId);
             Grade? existingGrade = await _dataContext.Grades
@@ -52,17 +47,56 @@ namespace SchoolAPI.Services.Impl
 
         public async Task<GradeResponseDto> GetGrade(long studentId, long courseId)
         {
-            throw new NotImplementedException();
+            Grade grade = await FindGradeByIdsOrThrow(studentId, courseId);
+
+            GradeResponseDto responseDto = _mapper.Map<GradeResponseDto>(grade)!;
+            return responseDto;
         }
 
         public async Task<GradeResponseDto> UpdateGrade(GradeRequestDto requestDto, long studentId, long courseId)
         {
-            throw new NotImplementedException();
+            Grade grade = await FindGradeByIdsOrThrow(studentId, courseId);
+
+            grade.Score = requestDto.Score;
+            await _dataContext.SaveChangesAsync();
+
+            GradeResponseDto responseDto = _mapper.Map<GradeResponseDto>(grade)!;
+            return responseDto;
         }
 
         public async Task DeleteGrade(long studentId, long courseId)
         {
+            Grade grade = await FindGradeByIdsOrThrow(studentId, courseId);
+
+            _dataContext.Grades.Remove(grade);
+            await _dataContext.SaveChangesAsync();
+        }
+
+        public Task<StudentGradesResponseDto> GetGradesByStudentId(long studentId)
+        {
             throw new NotImplementedException();
+        }
+
+        public Task<CourseGradesResponseDto> GetGradesByCourseId(long courseId)
+        {
+            throw new NotImplementedException();
+        }
+
+        // ----------------------------- Private Methods -----------------------------
+
+        private async Task<Grade> FindGradeByIdsOrThrow(long studentId, long courseId)
+        {
+            Grade? grade = await _dataContext.Grades
+                .Include(g => g.Student)
+                .Include(g => g.Course)
+                .FirstOrDefaultAsync(g => g.Student.Id == studentId && g.Course.Id == courseId);
+
+            if (grade is null)
+            {
+                throw new GradeNotFoundException(studentId, courseId);
+            }
+
+            return grade;
         }
 
         private async Task<Student> FindStudnetByIdOrThrow(long studentId)
@@ -84,5 +118,6 @@ namespace SchoolAPI.Services.Impl
             }
             return course;
         }
+
     }
 }

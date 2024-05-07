@@ -55,7 +55,6 @@ namespace SchoolAPI.Controllers
         [ProducesResponseType<GradeResponseDto>(200)]
         [ProducesResponseType<ValidationProblemDetails>(400)]
         [ProducesResponseType<ErrorResponse>(404)]
-        [ProducesResponseType<ErrorResponse>(409)]
         [ProducesResponseType(500)]
         public async Task<ActionResult<GradeResponseDto>> UpdateGrade([FromBody] GradeRequestDto grade,
             [FromRoute] long studentId, [FromRoute] long courseId)
