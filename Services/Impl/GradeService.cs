@@ -3,7 +3,9 @@ using Microsoft.EntityFrameworkCore;
 using SchoolAPI.Data;
 using SchoolAPI.Exceptions.Conflict;
 using SchoolAPI.Exceptions.NotFound;
+using SchoolAPI.Models.DTOs.Course;
 using SchoolAPI.Models.DTOs.Grade;
+using SchoolAPI.Models.DTOs.Student;
 using SchoolAPI.Models.Entites;
 
 namespace SchoolAPI.Services.Impl
@@ -72,12 +74,39 @@ namespace SchoolAPI.Services.Impl
             await _dataContext.SaveChangesAsync();
         }
 
-        public Task<StudentGradesResponseDto> GetGradesByStudentId(long studentId)
+        public async Task<StudentGradesResponseDto> GetGradesByStudentId(long studentId)
         {
-            throw new NotImplementedException();
+            Student? student = await _dataContext.Students
+                .Include(s => s.Courses)
+                .Include(s => s.Grades)
+                .FirstOrDefaultAsync(s => s.Id == studentId);
+
+            if (student == null)
+            {
+                throw new StudentNotFoundException(studentId);
+            }
+
+            HashSet<CourseGradeResponseDto> courseGrades =
+                student.Grades.Join(
+                    student.Courses,
+                    grade => grade.Course.Id,
+                    course => course.Id,
+                    (grade, course) => new CourseGradeResponseDto()
+                    {
+                        Score = grade.Score,
+                        Course = _mapper.Map<CourseResponseDto>(course)!
+                    }).ToHashSet();
+
+            StudentGradesResponseDto responseDto = new()
+            {
+                Student = _mapper.Map<StudentResponseDto>(student)!,
+                Grades = courseGrades
+            };
+
+            return responseDto;
         }
 
-        public Task<CourseGradesResponseDto> GetGradesByCourseId(long courseId)
+        public async Task<CourseGradesResponseDto> GetGradesByCourseId(long courseId)
         {
             throw new NotImplementedException();
         }

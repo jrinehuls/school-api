@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.JSInterop.Infrastructure;
 using SchoolAPI.Filters;
 using SchoolAPI.Models.DTOs;
 using SchoolAPI.Models.DTOs.Grade;
@@ -72,6 +73,18 @@ namespace SchoolAPI.Controllers
         {
             await _gradeService.DeleteGrade(studentId, courseId);
             return NoContent();
+        }
+
+        [HttpGet("student/{studentId:long:min(1)}", Name = "GetStudentGrades")]
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType<StudentGradesResponseDto>(200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType<ErrorResponse>(404)]
+        [ProducesResponseType(500)]
+        public async Task<ActionResult<StudentGradesResponseDto>> GetStudentGrades([FromRoute] long studentId)
+        {
+            StudentGradesResponseDto responseDto = await _gradeService.GetGradesByStudentId(studentId);
+            return Ok(responseDto);
         }
     }
 }
