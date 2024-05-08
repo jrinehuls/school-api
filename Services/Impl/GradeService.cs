@@ -91,24 +91,15 @@ namespace SchoolAPI.Services.Impl
                     student.Courses,
                     grade => grade.Course.Id,
                     course => course.Id,
-                    (grade, course) => new CourseGradeResponseDto()
-                    {
-                        Id = course.Id,
-                        Code = course.Code,
-                        Name = course.Name,
-                        Description = course.Description,
-                        Grade = _mapper.Map<GradeScoreResponseDto>(grade)!
-                    }).ToHashSet();
+                    (grade, course) => {
+                        CourseGradeResponseDto courseResponse = _mapper.Map<CourseGradeResponseDto>(course)!;
+                        courseResponse.Grade = _mapper.Map<GradeScoreResponseDto>(grade)!;
+                        return courseResponse;
+                    }
+                ).ToHashSet();
 
-            StudentGradesResponseDto responseDto = new()
-            {
-                Id = student.Id,
-                FirstName = student.FirstName,
-                LastName = student.LastName,
-                Email = student.Email,
-                BirthDate = student.BirthDate,
-                Grades = courseGrades
-            };
+            StudentGradesResponseDto responseDto = _mapper.Map<StudentGradesResponseDto>(student)!;
+            responseDto.CourseGrades = courseGrades;
 
             return responseDto;
         }
@@ -116,7 +107,32 @@ namespace SchoolAPI.Services.Impl
         /*
         public async Task<CourseGradesResponseDto> GetGradesByCourseId(long courseId)
         {
-            throw new NotImplementedException();
+            Course? course = await _dataContext.Courses
+                .Include(c => c.Students)
+                .Include(c => c.Grades)
+                .FirstOrDefaultAsync(c => c.Id == courseId);
+
+            if (course == null)
+            {
+                throw new CourseNotFoundException(courseId);
+            }
+
+            HashSet<StudentGradeResponseDto> studentGrades =
+                course.Grades.Join(
+                    course.Students,
+                    grade => grade.Student.Id,
+                    student => student.Id,
+                    (student, course) => {
+                        StudentGradeResponseDto studentResponse = _mapper.Map<StudentGradeResponseDto>(student)!;
+                        studentResponse.Grade = _mapper.Map<GradeScoreResponseDto>(grade)!;
+                        return studentResponse;
+                    }
+                ).ToHashSet();
+
+            CourseGradesResponseDto responseDto = _mapper.Map<CourseGradesResponseDto>(course)!;
+            responseDto.StudentGrades = studentGrades;
+
+            return responseDto;
         }*/
 
         // ----------------------------- Private Methods -----------------------------

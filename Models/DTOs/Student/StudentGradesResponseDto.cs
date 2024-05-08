@@ -9,6 +9,6 @@ namespace SchoolAPI.Models.DTOs.Student
         public string? LastName { get; set; }
         public string? Email { get; set; }
         public DateTime? BirthDate { get; set; }
-        public HashSet<CourseGradeResponseDto> Grades { get; set; } = [];
+        public HashSet<CourseGradeResponseDto> CourseGrades { get; set; } = [];
     }
 }
