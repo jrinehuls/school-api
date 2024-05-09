@@ -1,0 +1,9 @@
+select s.Id, s.FirstName, s.LastName, s.Email, s.BirthDate, c.Id, c.Name, c.Code, c.Description, g.Score
+from Courses as c
+	left join CourseStudent as cs
+		on c.Id = cs.CoursesId
+	left join Students as s
+		on cs.StudentsId = s.id
+	left join Grades as g
+		on g.CourseId = c.Id and g.StudentId = s.Id
+where s.Id = 1 and g.Score is not null

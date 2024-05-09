@@ -104,7 +104,6 @@ namespace SchoolAPI.Services.Impl
             return responseDto;
         }
 
-        /*
         public async Task<CourseGradesResponseDto> GetGradesByCourseId(long courseId)
         {
             Course? course = await _dataContext.Courses
@@ -122,7 +121,7 @@ namespace SchoolAPI.Services.Impl
                     course.Students,
                     grade => grade.Student.Id,
                     student => student.Id,
-                    (student, course) => {
+                    (grade, student) => {
                         StudentGradeResponseDto studentResponse = _mapper.Map<StudentGradeResponseDto>(student)!;
                         studentResponse.Grade = _mapper.Map<GradeScoreResponseDto>(grade)!;
                         return studentResponse;
@@ -133,7 +132,7 @@ namespace SchoolAPI.Services.Impl
             responseDto.StudentGrades = studentGrades;
 
             return responseDto;
-        }*/
+        }
 
         // ----------------------------- Private Methods -----------------------------
 

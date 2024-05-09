@@ -13,12 +13,14 @@ namespace SchoolAPI.Mappers
             CreateMap<Student, StudentResponseDto>();
             CreateMap<StudentRequestDto, Student>();
             CreateMap<Student, StudentCoursesResponseDto>();
+            CreateMap<Student, StudentGradeResponseDto>();
             CreateMap<Student, StudentGradesResponseDto>();
 
             CreateMap<Course, CourseResponseDto>();
             CreateMap<CourseRequestDto, Course>();
             CreateMap<Course, CourseStudentsResponseDto>();
             CreateMap<Course, CourseGradeResponseDto>();
+            CreateMap<Course, CourseGradesResponseDto>();
 
             CreateMap<Grade, GradeResponseDto>();
             CreateMap<Grade, GradeScoreResponseDto>();

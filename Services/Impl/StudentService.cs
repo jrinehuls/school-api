@@ -14,11 +14,13 @@ namespace SchoolAPI.Services.Impl
 
         private readonly DataContext _dataContext;
         private readonly IMapper _mapper;
+        private readonly IGradeService _gradeService;
 
-        public StudentService(DataContext dataContext, IMapper mapper)
+        public StudentService(DataContext dataContext, IMapper mapper, IGradeService gradeService)
         {
             _dataContext = dataContext;
             _mapper = mapper;
+            _gradeService = gradeService;
         }
 
         public async Task<List<StudentResponseDto>> GetStudents()
@@ -117,6 +119,12 @@ namespace SchoolAPI.Services.Impl
             {
                 throw new StudentNotEnrolledException(studentId, courseId);
             }
+
+            try
+            {
+                await _gradeService.DeleteGrade(studentId, courseId);
+            }
+            catch (GradeNotFoundException) { }
 
             student.Courses.Remove(course);
             await _dataContext.SaveChangesAsync();

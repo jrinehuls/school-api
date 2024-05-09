@@ -5,6 +5,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace SchoolAPI.Models.Entites
 {
     [Index("StudentId", "CourseId", IsUnique = true)]
+    [Index("StudentId")]
+    [Index("CourseId")]
     public class Grade
     {
         [Key]
